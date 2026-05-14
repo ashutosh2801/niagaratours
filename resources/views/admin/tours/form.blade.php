@@ -7,26 +7,32 @@
             <span class="text-gray-900 font-medium">{{ $tourId ? 'Edit: ' . ($title ?? 'Tour') : 'Create Tour' }}</span>
         </nav>
         <div class="max-w-4xl">
-        <form wire:submit.prevent="save" class="space-y-6">
+        <form x-data="{
+            async submit() {
+                const editor = document.querySelector('trix-editor');
+                if (editor) await $wire.set('description', editor.value);
+                $wire.save();
+            }
+        }" x-on:submit.prevent="submit()">
             <!-- Basic Information -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                        <input type="text" id="title" wire:model="title"
+                        <input type="text" id="title" wire:model.blur="title"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         @error('title') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div class="md:col-span-2">
                         <label for="slug" class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-                        <input type="text" id="slug" wire:model="slug"
+                        <input type="text" id="slug" wire:model.blur="slug"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         @error('slug') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div class="md:col-span-2">
                         <label for="short_description" class="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
-                        <textarea id="short_description" wire:model="short_description" rows="3"
+                        <textarea id="short_description" wire:model.blur="short_description" rows="3"
                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
                         @error('short_description') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
@@ -53,9 +59,20 @@
                     </div>
                     <div>
                         <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                        <input type="text" id="location" wire:model="location"
+                        <input type="text" id="location" wire:model.blur="location"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         @error('location') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label for="destination_id" class="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+                        <select id="destination_id" wire:model="destination_id"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="">Select Destination</option>
+                            @foreach($destinations ?? [] as $destination)
+                                <option value="{{ $destination->id }}">{{ $destination->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('destination_id') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                 </div>
             </div>
@@ -66,7 +83,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-                        <input type="number" id="duration" wire:model="duration" min="1"
+                        <input type="number" id="duration" wire:model.blur="duration" min="1"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         @error('duration') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
@@ -82,7 +99,7 @@
                     </div>
                     <div>
                         <label for="max_people" class="block text-sm font-medium text-gray-700 mb-1">Max People</label>
-                        <input type="number" id="max_people" wire:model="max_people" min="1"
+                        <input type="number" id="max_people" wire:model.blur="max_people" min="1"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         @error('max_people') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
@@ -122,20 +139,20 @@
                                 @foreach($pricing ?? [] as $index => $item)
                                     <tr wire:key="pricing-{{ $index }}" class="border-b border-gray-100">
                                         <td class="py-3 pr-4">
-                                            <input type="text" wire:model="pricing.{{ $index }}.label" placeholder="Adult"
+                                            <input type="text" wire:model.blur="pricing.{{ $index }}.label" placeholder="Adult"
                                                    class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                                             <input type="hidden" wire:model="pricing.{{ $index }}.category">
                                         </td>
                                         <td class="py-3 pr-4">
-                                            <input type="number" wire:model="pricing.{{ $index }}.price" step="0.01" min="0" placeholder="0.00"
+                                            <input type="number" wire:model.blur="pricing.{{ $index }}.price" step="0.01" min="0" placeholder="0.00"
                                                    class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                                         </td>
                                         <td class="py-3 pr-4">
-                                            <input type="number" wire:model="pricing.{{ $index }}.sale_price" step="0.01" min="0" placeholder="0.00"
+                                            <input type="number" wire:model.blur="pricing.{{ $index }}.sale_price" step="0.01" min="0" placeholder="0.00"
                                                    class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                                         </td>
                                         <td class="py-3 pr-4">
-                                            <input type="number" wire:model="pricing.{{ $index }}.min_qty" min="0" placeholder="0"
+                                            <input type="number" wire:model.blur="pricing.{{ $index }}.min_qty" min="0" placeholder="0"
                                                    class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                                         </td>
                                         <td class="py-3">
@@ -249,7 +266,7 @@
                 </div>
                 @foreach($highlights ?? [] as $index => $highlight)
                     <div wire:key="highlight-{{ $index }}" class="flex items-center gap-2 mb-2">
-                        <input type="text" wire:model="highlights.{{ $index }}" placeholder="Enter a highlight"
+                        <input type="text" wire:model.blur="highlights.{{ $index }}" placeholder="Enter a highlight"
                                class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         <button type="button" wire:click="removeHighlight({{ $index }})"
                                 class="p-2 text-gray-400 hover:text-red-600">
@@ -269,7 +286,7 @@
                     </div>
                     @foreach($inclusions ?? [] as $index => $inclusion)
                         <div wire:key="inclusion-{{ $index }}" class="flex items-center gap-2 mb-2">
-                            <input type="text" wire:model="inclusions.{{ $index }}" placeholder="Include this..."
+                            <input type="text" wire:model.blur="inclusions.{{ $index }}" placeholder="Include this..."
                                    class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
                             <button type="button" wire:click="removeInclusion({{ $index }})"
                                     class="p-2 text-gray-400 hover:text-red-600">
@@ -287,7 +304,7 @@
                     </div>
                     @foreach($exclusions ?? [] as $index => $exclusion)
                         <div wire:key="exclusion-{{ $index }}" class="flex items-center gap-2 mb-2">
-                            <input type="text" wire:model="exclusions.{{ $index }}" placeholder="Exclude this..."
+                            <input type="text" wire:model.blur="exclusions.{{ $index }}" placeholder="Exclude this..."
                                    class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500">
                             <button type="button" wire:click="removeExclusion({{ $index }})"
                                     class="p-2 text-gray-400 hover:text-red-600">
@@ -313,9 +330,9 @@
                                     class="text-sm text-red-600 hover:text-red-700">Remove</button>
                         </div>
                         <div class="space-y-3">
-                            <input type="text" wire:model="itinerary.{{ $index }}.title" placeholder="Day title"
+                            <input type="text" wire:model.blur="itinerary.{{ $index }}.title" placeholder="Day title"
                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                            <textarea wire:model="itinerary.{{ $index }}.description" rows="3" placeholder="Day description"
+                            <textarea wire:model.blur="itinerary.{{ $index }}.description" rows="3" placeholder="Day description"
                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
                         </div>
                     </div>
@@ -337,9 +354,9 @@
                                     class="text-sm text-red-600 hover:text-red-700">Remove</button>
                         </div>
                         <div class="space-y-3">
-                            <input type="text" wire:model="faqs.{{ $index }}.question" placeholder="Question"
+                            <input type="text" wire:model.blur="faqs.{{ $index }}.question" placeholder="Question"
                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                            <textarea wire:model="faqs.{{ $index }}.answer" rows="3" placeholder="Answer"
+                            <textarea wire:model.blur="faqs.{{ $index }}.answer" rows="3" placeholder="Answer"
                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
                         </div>
                     </div>
@@ -352,13 +369,13 @@
                 <div class="space-y-4">
                     <div>
                         <label for="meta_title" class="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
-                        <input type="text" id="meta_title" wire:model="meta_title"
+                        <input type="text" id="meta_title" wire:model.blur="meta_title"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         @error('meta_title') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label for="meta_description" class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
-                        <textarea id="meta_description" wire:model="meta_description" rows="3"
+                        <textarea id="meta_description" wire:model.blur="meta_description" rows="3"
                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
                         @error('meta_description') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>

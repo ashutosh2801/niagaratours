@@ -23,7 +23,7 @@ class TourDetail extends Component
     {
         return Tour::where('slug', $this->slug)
             ->where('is_active', true)
-            ->with(['category', 'orderItems'])
+            ->with(['category', 'destination', 'orderItems'])
             ->first();
     }
 

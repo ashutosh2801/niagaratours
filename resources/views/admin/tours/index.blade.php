@@ -19,6 +19,7 @@
                         <th class="px-6 py-3 w-16">Image</th>
                         <th class="px-6 py-3">Title</th>
                         <th class="px-6 py-3">Category</th>
+                        <th class="px-6 py-3">Destination</th>
                         <th class="px-6 py-3">Price</th>
                         <th class="px-6 py-3">Status</th>
                         <th class="px-6 py-3">Featured</th>
@@ -43,6 +44,7 @@
                                 <p class="text-xs text-gray-500 mt-0.5">{{ $tour->slug }}</p>
                             </td>
                             <td class="px-6 py-4 text-gray-700">{{ $tour->category->name ?? 'Uncategorized' }}</td>
+                            <td class="px-6 py-4 text-gray-700">{{ $tour->destination->name ?? '-' }}</td>
                             <td class="px-6 py-4">
                                 <span class="font-medium text-gray-900">${{ number_format($tour->price, 2) }}</span>
                                 @if($tour->sale_price)

@@ -32,6 +32,18 @@
                     </div>
 
                     <div>
+                        <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Destination</h3>
+                        <div class="space-y-2">
+                            @foreach($destinations ?? [] as $destination)
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" wire:model.live="selectedDestinations" value="{{ $destination->id }}" class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                                    <span class="text-sm text-gray-600 group-hover:text-gray-900">{{ $destination->name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div>
                         <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Price Range</h3>
                         <div class="flex items-center justify-between text-sm text-gray-700 mb-2" x-data="{ min: $wire.entangle('min_price'), max: $wire.entangle('max_price') }">
                             <span x-text="'$' + Number(min).toLocaleString()">${{ number_format($min_price) }}</span>

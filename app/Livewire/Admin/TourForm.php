@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Tour;
 use App\Models\Category;
+use App\Models\Destination;
 use Illuminate\Support\Str;
 
 #[Title('Tour Form')]
@@ -20,6 +21,7 @@ class TourForm extends Component
     public $short_description;
     public $description;
     public $category_id;
+    public $destination_id;
     public $location;
     public $duration;
     public $duration_type = 'hours';
@@ -69,6 +71,7 @@ class TourForm extends Component
             $this->short_description = $tour->short_description;
             $this->description = $tour->description;
             $this->category_id = $tour->category_id;
+            $this->destination_id = $tour->destination_id;
             $this->location = $tour->location;
             $this->duration = $tour->duration;
             $this->duration_type = $tour->duration_type;
@@ -198,6 +201,7 @@ class TourForm extends Component
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:tours,slug,' . $this->tourId,
             'category_id' => 'nullable|exists:categories,id',
+            'destination_id' => 'nullable|exists:destinations,id',
             'location' => 'nullable|string|max:255',
             'duration' => 'nullable|integer|min:1',
             'duration_type' => 'required|in:hours,days',
@@ -235,6 +239,7 @@ class TourForm extends Component
             'short_description' => $this->short_description,
             'description' => $this->description,
             'category_id' => $this->category_id,
+            'destination_id' => $this->destination_id,
             'location' => $this->location,
             'duration' => $this->duration,
             'duration_type' => $this->duration_type,
@@ -272,7 +277,8 @@ class TourForm extends Component
     public function render()
     {
         return view('admin.tours.form', [
-            'categories' => Category::orderBy('name', 'asc')->get()
+            'categories' => Category::orderBy('name', 'asc')->get(),
+            'destinations' => Destination::orderBy('name', 'asc')->get()
         ]);
     }
 }

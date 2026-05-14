@@ -3,6 +3,7 @@
 namespace App\Livewire\Front;
 
 use App\Models\Category;
+use App\Models\Destination;
 use App\Models\Tour;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -17,6 +18,7 @@ class TourList extends Component
 
     public $search = '';
     public $selectedCategories = [];
+    public $selectedDestinations = [];
     public $min_price = 0;
     public $max_price = 1000;
     public $selectedDurations = [];
@@ -25,6 +27,7 @@ class TourList extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'selectedCategories' => ['except' => []],
+        'selectedDestinations' => ['except' => []],
         'min_price' => ['except' => 0],
         'max_price' => ['except' => 1000],
         'selectedDurations' => ['except' => []],
@@ -69,7 +72,7 @@ class TourList extends Component
 
     public function resetFilters()
     {
-        $this->reset(['search', 'selectedCategories', 'min_price', 'max_price', 'selectedDurations', 'sortBy']);
+        $this->reset(['search', 'selectedCategories', 'selectedDestinations', 'min_price', 'max_price', 'selectedDurations', 'sortBy']);
         $this->min_price = 0;
         $this->max_price = 1000;
         $this->resetPage();
@@ -89,6 +92,10 @@ class TourList extends Component
 
         if (!empty($this->selectedCategories)) {
             $query->whereIn('category_id', $this->selectedCategories);
+        }
+
+        if (!empty($this->selectedDestinations)) {
+            $query->whereIn('destination_id', $this->selectedDestinations);
         }
 
         if ($this->min_price > 0) {
@@ -130,10 +137,12 @@ class TourList extends Component
 
         $tours = $query->paginate(12);
         $categories = Category::where('is_active', true)->orderBy('name')->get();
+        $destinations = Destination::where('is_active', true)->orderBy('name')->get();
 
         return view('front.tours', [
             'tours' => $tours,
             'categories' => $categories,
+            'destinations' => $destinations,
         ]);
     }
 }

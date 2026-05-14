@@ -25,9 +25,11 @@ class TourList extends Component
     public function render()
     {
         return view('admin.tours.index', [
-            'tours' => Tour::with('category')
-                ->where('title', 'like', '%'.$this->search.'%')
-                ->orWhere('location', 'like', '%'.$this->search.'%')
+            'tours' => Tour::with('category', 'destination')
+                ->where(function ($q) {
+                    $q->where('title', 'like', '%'.$this->search.'%')
+                      ->orWhere('location', 'like', '%'.$this->search.'%');
+                })
                 ->orderBy('created_at', 'desc')
                 ->paginate(10)
         ]);

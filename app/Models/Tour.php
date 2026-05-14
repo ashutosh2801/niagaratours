@@ -12,6 +12,7 @@ class Tour extends Model
         'title',
         'slug',
         'category_id',
+        'destination_id',
         'short_description',
         'description',
         'location',
@@ -57,6 +58,11 @@ class Tour extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function destination(): BelongsTo
+    {
+        return $this->belongsTo(Destination::class);
     }
 
     public function orderItems(): HasMany

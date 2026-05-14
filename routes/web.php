@@ -13,6 +13,10 @@ use App\Livewire\Admin\PageForm;
 use App\Livewire\Admin\NotificationList;
 use App\Livewire\Admin\UserList;
 use App\Livewire\Admin\DashboardStats;
+use App\Livewire\Admin\CategoryList;
+use App\Livewire\Admin\CategoryForm;
+use App\Livewire\Admin\DestinationList;
+use App\Livewire\Admin\DestinationForm;
 
 Route::view('/', 'welcome')->name('home');
 Route::get('/tours', App\Livewire\Front\TourList::class)->name('tours');
@@ -23,12 +27,14 @@ Route::view('/about', 'front.about')->name('about');
 Route::view('/contact', 'front.contact')->name('contact');
 Route::get('/page/{page}', App\Livewire\Front\PageShow::class)->name('page.show');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
-});
-
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardStats::class)->name('dashboard');
+    Route::get('/categories', CategoryList::class)->name('categories');
+    Route::get('/categories/create', CategoryForm::class)->name('categories.create');
+    Route::get('/categories/{categoryId}/edit', CategoryForm::class)->name('categories.edit');
+    Route::get('/destinations', DestinationList::class)->name('destinations');
+    Route::get('/destinations/create', DestinationForm::class)->name('destinations.create');
+    Route::get('/destinations/{destinationId}/edit', DestinationForm::class)->name('destinations.edit');
     Route::get('/tours', TourList::class)->name('tours');
     Route::get('/tours/create', TourForm::class)->name('tours.create');
     Route::get('/tours/{tourId}/edit', TourForm::class)->name('tours.edit');
@@ -46,4 +52,3 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/settings', App\Livewire\Admin\SiteSettings::class)->name('settings');
 });
 
-require __DIR__.'/settings.php';

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Category;
+use App\Models\Destination;
 use App\Models\Tour;
 use App\Models\Page;
 use Database\Seeders\HomepageSectionSeeder;
@@ -43,10 +44,23 @@ class DatabaseSeeder extends Seeder
             Category::create($cat);
         }
 
+        // Destinations
+        $destinations = [
+            ['name' => 'Niagara Falls', 'slug' => 'niagara-falls', 'description' => 'Experience the majesty of Niagara Falls', 'sort_order' => 1],
+            ['name' => 'Niagara-on-the-Lake', 'slug' => 'niagara-on-the-lake', 'description' => 'Charming historic town with wineries', 'sort_order' => 2],
+            ['name' => 'Toronto', 'slug' => 'toronto', 'description' => 'Canada\'s largest city', 'sort_order' => 3],
+            ['name' => 'Wine Country', 'slug' => 'wine-country', 'description' => 'World-class wineries and vineyards', 'sort_order' => 4],
+        ];
+
+        foreach ($destinations as $dest) {
+            Destination::create($dest);
+        }
+
         // Sample tours
         $tours = [
             [
                 'category_id' => 1,
+                'destination_id' => 1,
                 'title' => 'Niagara Falls Adventure Tour',
                 'slug' => 'niagara-falls-adventure-tour',
                 'short_description' => 'Experience the thrill of Niagara Falls up close',
@@ -68,6 +82,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'category_id' => 2,
+                'destination_id' => 1,
                 'title' => 'Sunset Dinner Cruise',
                 'slug' => 'sunset-dinner-cruise',
                 'short_description' => 'Romantic dinner cruise with stunning sunset views',
@@ -89,6 +104,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'category_id' => 3,
+                'destination_id' => 2,
                 'title' => 'Niagara Wine Country Tour',
                 'slug' => 'niagara-wine-country-tour',
                 'short_description' => 'Explore world-class wineries in Niagara',
@@ -110,6 +126,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'category_id' => 5,
+                'destination_id' => 1,
                 'title' => 'Niagara Helicopter Tour',
                 'slug' => 'niagara-helicopter-tour',
                 'short_description' => 'Breathtaking aerial views of Niagara Falls',
@@ -131,6 +148,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'category_id' => 4,
+                'destination_id' => 1,
                 'title' => 'Family Fun Package',
                 'slug' => 'family-fun-package',
                 'short_description' => 'Perfect family day out at Niagara Falls',
@@ -152,6 +170,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'category_id' => 6,
+                'destination_id' => 2,
                 'title' => 'Niagara Walking History Tour',
                 'slug' => 'niagara-walking-history-tour',
                 'short_description' => 'Discover the rich history of Niagara',
