@@ -5,24 +5,22 @@ namespace App\Livewire\Admin;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use App\Models\Destination;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 #[Title('Destination Form')]
 #[Layout('layouts.admin')]
 class DestinationForm extends Component
 {
-    use WithFileUploads;
+    protected $listeners = ['mediaSelected' => 'setImageFromMedia'];
 
     public $destinationId = null;
     public $name;
     public $slug;
     public $description;
-    public $image;
     public $existingImage;
     public $is_active = true;
+    public $is_popular = false;
     public $sort_order = 0;
 
     public function mount($destinationId = null)
@@ -36,7 +34,16 @@ class DestinationForm extends Component
             $this->description = $destination->description;
             $this->existingImage = $destination->image;
             $this->is_active = $destination->is_active;
+            $this->is_popular = $destination->is_popular;
             $this->sort_order = $destination->sort_order ?? 0;
+        }
+    }
+
+    public function setImageFromMedia($urls)
+    {
+        $url = is_array($urls) ? ($urls[0] ?? null) : $urls;
+        if ($url) {
+            $this->existingImage = $url;
         }
     }
 
@@ -53,8 +60,8 @@ class DestinationForm extends Component
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:destinations,slug,' . $this->destinationId,
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
             'is_active' => 'boolean',
+            'is_popular' => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
 
@@ -62,23 +69,11 @@ class DestinationForm extends Component
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
+            'image' => $this->existingImage,
             'is_active' => $this->is_active,
+            'is_popular' => $this->is_popular,
             'sort_order' => $this->sort_order,
         ];
-
-        if ($this->image) {
-            $path = $this->image->store('destinations', 'public');
-            $data['image'] = Storage::disk('public')->url($path);
-
-            if ($this->existingImage) {
-                $oldPath = str_replace(Storage::disk('public')->url('/'), '', $this->existingImage);
-                if (Storage::disk('public')->exists($oldPath)) {
-                    Storage::disk('public')->delete($oldPath);
-                }
-            }
-        } else {
-            $data['image'] = $this->existingImage;
-        }
 
         if ($this->destinationId) {
             $destination = Destination::findOrFail($this->destinationId);
@@ -94,14 +89,7 @@ class DestinationForm extends Component
 
     public function removeImage()
     {
-        if ($this->existingImage) {
-            $oldPath = str_replace(Storage::disk('public')->url('/'), '', $this->existingImage);
-            if (Storage::disk('public')->exists($oldPath)) {
-                Storage::disk('public')->delete($oldPath);
-            }
-        }
         $this->existingImage = null;
-        $this->image = null;
     }
 
     public function render()

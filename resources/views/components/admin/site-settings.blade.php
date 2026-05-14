@@ -160,6 +160,22 @@
             </div>
         </div>
 
+        {{-- Stripe --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Stripe Payment</h3>
+            <p class="text-sm text-gray-500 mb-4">Enter your Stripe API keys. You can also set them via <code class="text-xs bg-gray-100 px-1 rounded">STRIPE_KEY</code> and <code class="text-xs bg-gray-100 px-1 rounded">STRIPE_SECRET</code> in your .env file. Values entered here will override .env values.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Publishable Key</label>
+                    <input type="text" wire:model="stripe_key" placeholder="pk_live_..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Secret Key</label>
+                    <input type="password" wire:model="stripe_secret" placeholder="sk_live_..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+            </div>
+        </div>
+
         <div class="flex items-center justify-end gap-3">
             <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700" wire:loading.attr="disabled">
                 Save All Settings

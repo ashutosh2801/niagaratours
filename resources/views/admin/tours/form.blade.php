@@ -9,11 +9,11 @@
         <div class="max-w-4xl">
         <form x-data="{
             async submit() {
-                const editor = document.querySelector('trix-editor');
-                if (editor) await $wire.set('description', editor.value);
+                const input = document.querySelector('[data-summernote-description]');
+                if (input) await $wire.set('description', input.value);
                 $wire.save();
             }
-        }" x-on:submit.prevent="submit()">
+        }" x-on:submit.prevent="submit()" class="space-y-6">
             <!-- Basic Information -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
@@ -37,7 +37,7 @@
                         @error('short_description') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     <div class="md:col-span-2">
-                        <x-admin.trix-editor wire="description" :value="$description ?? ''" label="Description" :error="$errors->first('description')" />
+                        <x-admin.summernote-editor ref="description" :value="$description ?? ''" label="Description" :error="$errors->first('description')" />
                     </div>
                 </div>
             </div>
@@ -110,67 +110,84 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Pricing</h2>
 
-                <div x-data="{ type: $wire.$entangle('pricingType') }">
+                <div>
                     <div class="flex items-center gap-6 mb-4">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="pricingType" value="per_person" x-model="type"
+                            <input type="radio" name="pricingType" value="per_person" wire:model="pricingType"
                                    class="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500">
                             <span class="text-sm font-medium text-gray-700">By Person</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="pricingType" value="fixed" x-model="type"
+                            <input type="radio" name="pricingType" value="fixed" wire:model="pricingType"
                                    class="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500">
                             <span class="text-sm font-medium text-gray-700">By Fixed (Group Tour)</span>
                         </label>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="border-b border-gray-200">
-                                    <th class="text-left py-2 pr-4 font-medium text-gray-700">Label</th>
-                                    <th class="text-left py-2 pr-4 font-medium text-gray-700">Price ($)</th>
-                                    <th class="text-left py-2 pr-4 font-medium text-gray-700">Sale Price ($)</th>
-                                    <th class="text-left py-2 pr-4 font-medium text-gray-700">Min Qty</th>
-                                    <th class="text-left py-2 font-medium text-gray-700"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($pricing ?? [] as $index => $item)
-                                    <tr wire:key="pricing-{{ $index }}" class="border-b border-gray-100">
-                                        <td class="py-3 pr-4">
-                                            <input type="text" wire:model.blur="pricing.{{ $index }}.label" placeholder="Adult"
-                                                   class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                            <input type="hidden" wire:model="pricing.{{ $index }}.category">
-                                        </td>
-                                        <td class="py-3 pr-4">
-                                            <input type="number" wire:model.blur="pricing.{{ $index }}.price" step="0.01" min="0" placeholder="0.00"
-                                                   class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                        </td>
-                                        <td class="py-3 pr-4">
-                                            <input type="number" wire:model.blur="pricing.{{ $index }}.sale_price" step="0.01" min="0" placeholder="0.00"
-                                                   class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                        </td>
-                                        <td class="py-3 pr-4">
-                                            <input type="number" wire:model.blur="pricing.{{ $index }}.min_qty" min="0" placeholder="0"
-                                                   class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                        </td>
-                                        <td class="py-3">
-                                            <button type="button" wire:click="removePricingRow({{ $index }})"
-                                                    class="p-1.5 text-gray-400 hover:text-red-600 transition-colors">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                    @if($pricingType === 'per_person')
+                        <div wire:key="per-person-pricing">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="border-b border-gray-200">
+                                            <th class="text-left py-2 pr-4 font-medium text-gray-700">Label</th>
+                                            <th class="text-left py-2 pr-4 font-medium text-gray-700">Price ($)</th>
+                                            <th class="text-left py-2 pr-4 font-medium text-gray-700">Sale Price ($)</th>
+                                            <th class="text-left py-2 pr-4 font-medium text-gray-700">Min Qty</th>
+                                            <th class="text-left py-2 font-medium text-gray-700"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($pricing ?? [] as $index => $item)
+                                            <tr wire:key="pricing-{{ $index }}" class="border-b border-gray-100">
+                                                <td class="py-3 pr-4">
+                                                    <input type="text" wire:model.blur="pricing.{{ $index }}.label" placeholder="Adult"
+                                                           class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                    <input type="hidden" wire:model="pricing.{{ $index }}.category">
+                                                </td>
+                                                <td class="py-3 pr-4">
+                                                    <input type="number" wire:model.blur="pricing.{{ $index }}.price" step="0.01" min="0" placeholder="0.00"
+                                                           class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                </td>
+                                                <td class="py-3 pr-4">
+                                                    <input type="number" wire:model.blur="pricing.{{ $index }}.sale_price" step="0.01" min="0" placeholder="0.00"
+                                                           class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                </td>
+                                                <td class="py-3 pr-4">
+                                                    <input type="number" wire:model.blur="pricing.{{ $index }}.min_qty" min="0" placeholder="0"
+                                                           class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                </td>
+                                                <td class="py-3">
+                                                    <button type="button" wire:click="removePricingRow({{ $index }})"
+                                                            class="p-1.5 text-gray-400 hover:text-red-600 transition-colors">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
 
-                    <button type="button" wire:click="addPricingRow"
-                            class="mt-3 text-sm font-medium text-primary-600 hover:text-primary-700">
-                        + Add Category
-                    </button>
+                            <button type="button" wire:click="addPricingRow"
+                                    class="mt-3 text-sm font-medium text-primary-600 hover:text-primary-700">
+                                + Add Category
+                            </button>
+                        </div>
+                    @else
+                        <div wire:key="fixed-pricing" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Group Price ($)</label>
+                                <input type="number" wire:model.blur="pricing.0.price" step="0.01" min="0" placeholder="0.00"
+                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Sale Price ($)</label>
+                                <input type="number" wire:model.blur="pricing.0.sale_price" step="0.01" min="0" placeholder="0.00"
+                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 @error('pricing.*.price') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
@@ -386,7 +403,7 @@
             <div class="flex items-center justify-end gap-3">
                 <a href="{{ route('admin.tours') }}" wire:navigate class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</a>
                 <button type="submit" class="px-6 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors" wire:loading.attr="disabled" wire:target="save">
-                    <span wire:loading.remove wire:target="save">{{ isset($tour) ? 'Update' : 'Create Tour' }}</span>
+                    <span wire:loading.remove wire:target="save">{{ $tourId ? 'Update Tour' : 'Create Tour' }}</span>
                     <span wire:loading wire:target="save">Saving...</span>
                 </button>
             </div>

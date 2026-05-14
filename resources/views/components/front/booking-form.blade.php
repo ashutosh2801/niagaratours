@@ -1,17 +1,16 @@
 <section class="py-12 md:py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         @if($bookingConfirmed ?? false)
-            {{-- Success State --}}
+            {{-- Success State (fallback when Stripe not configured) --}}
             <div class="max-w-lg mx-auto text-center bg-white rounded-2xl shadow-lg border border-gray-200 p-8 md:p-12">
                 <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center">
                     <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 </div>
-                <h2 class="mt-4 text-2xl font-bold text-gray-900">Booking Confirmed!</h2>
-                <p class="mt-2 text-gray-600">Thank you for your booking. Your order number is:</p>
-                <p class="mt-2 text-lg font-bold text-primary-600">{{ $orderNumber ?? 'N/A' }}</p>
-                <p class="mt-1 text-sm text-gray-500">We'll send a confirmation email with your tour details.</p>
+                <h2 class="mt-4 text-2xl font-bold text-gray-900">Booking Created!</h2>
+                <p class="mt-2 text-gray-600">Your booking has been created. Please complete payment to confirm.</p>
+                <p class="mt-2 text-sm text-gray-500">Order: <strong class="text-primary-600">{{ $orderNumber ?? 'N/A' }}</strong></p>
                 <a href="{{ route('tours') }}" wire:navigate class="mt-6 inline-block px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-lg transition-colors duration-200">
-                    Book Another Tour
+                    Browse More Tours
                 </a>
             </div>
         @else
@@ -74,17 +73,16 @@
                                 </div>
                                 <div class="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-200">
                                     @php $quantities = $bookingData['quantities'] ?? []; @endphp
-                                    @foreach($pricingCategories as $item)
-                                        @if(is_null($item['price'])) @continue @endif
+                                    @if($pricingType === 'fixed' && count($pricingCategories) > 0 && !is_null($pricingCategories[0]['price'] ?? null))
                                         @php
+                                            $item = $pricingCategories[0];
                                             $qty = $quantities[$item['category']] ?? 0;
                                             $hasSale = !is_null($item['sale_price']);
-                                            $displayPrice = $hasSale ? $item['sale_price'] : $item['price'];
                                             $minQty = $item['min_qty'] ?? 0;
                                         @endphp
                                         <div class="flex items-center justify-between px-4 py-3 {{ $qty > 0 ? 'bg-primary-50/40' : 'bg-white' }}">
                                             <div class="min-w-0 flex-1">
-                                                <span class="text-sm font-medium text-gray-900">{{ $item['label'] }}</span>
+                                                <span class="text-sm font-medium text-gray-900">Group Booking</span>
                                                 <div class="text-xs">
                                                     @if($hasSale)
                                                         <span class="text-primary-600 font-medium">${{ number_format($item['sale_price'], 2) }}</span>
@@ -107,11 +105,46 @@
                                                 </button>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    @else
+                                        @foreach($pricingCategories as $item)
+                                            @if(is_null($item['price'])) @continue @endif
+                                            @php
+                                                $qty = $quantities[$item['category']] ?? 0;
+                                                $hasSale = !is_null($item['sale_price']);
+                                                $displayPrice = $hasSale ? $item['sale_price'] : $item['price'];
+                                                $minQty = $item['min_qty'] ?? 0;
+                                            @endphp
+                                            <div class="flex items-center justify-between px-4 py-3 {{ $qty > 0 ? 'bg-primary-50/40' : 'bg-white' }}">
+                                                <div class="min-w-0 flex-1">
+                                                    <span class="text-sm font-medium text-gray-900">{{ $item['label'] }}</span>
+                                                    <div class="text-xs">
+                                                        @if($hasSale)
+                                                            <span class="text-primary-600 font-medium">${{ number_format($item['sale_price'], 2) }}</span>
+                                                            <span class="text-gray-400 line-through ml-1">${{ number_format($item['price'], 2) }}</span>
+                                                        @else
+                                                            <span class="text-gray-500">${{ number_format($item['price'], 2) }}</span>
+                                                        @endif
+                                                        @if($minQty > 0)
+                                                            <span class="text-amber-600 ml-1">(min {{ $minQty }})</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden shrink-0 ml-3">
+                                                    <button type="button" wire:click="decrementQuantity('{{ $item['category'] }}')" class="px-2 py-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                                                    </button>
+                                                    <span class="px-3 py-1.5 text-sm font-medium text-gray-900 min-w-[2rem] text-center tabular-nums">{{ $qty }}</span>
+                                                    <button type="button" wire:click="incrementQuantity('{{ $item['category'] }}')" class="px-2 py-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
                                 </div>
                                 @php $totalSelected = array_sum($quantities); @endphp
                                 @if($totalSelected < 1)
-                                    <p class="mt-2 text-sm text-red-500">Please select at least one guest.</p>
+                                    <p class="mt-2 text-sm text-red-500">Please select at least {{ $pricingType === 'fixed' ? 'one group' : 'one guest' }}.</p>
                                 @endif
                             </div>
                         @endif
@@ -154,15 +187,27 @@
                             $quantities = $bookingData['quantities'] ?? [];
                             $summaryRows = [];
                         @endphp
-                        @foreach($pricingCategories as $item)
+                        @if($pricingType === 'fixed' && count($pricingCategories) > 0)
                             @php
+                                $item = $pricingCategories[0];
                                 $q = $quantities[$item['category']] ?? 0;
-                                if ($q < 1) continue;
-                                $unitPrice = $item['sale_price'] ?? $item['price'] ?? 0;
-                                $lineTotal = $unitPrice * $q;
-                                $summaryRows[] = ['label' => $item['label'], 'qty' => $q, 'unitPrice' => $unitPrice, 'lineTotal' => $lineTotal];
+                                if ($q > 0) {
+                                    $unitPrice = $item['sale_price'] ?? $item['price'] ?? 0;
+                                    $lineTotal = $unitPrice * $q;
+                                    $summaryRows[] = ['label' => 'Group Booking', 'qty' => $q, 'unitPrice' => $unitPrice, 'lineTotal' => $lineTotal];
+                                }
                             @endphp
-                        @endforeach
+                        @else
+                            @foreach($pricingCategories as $item)
+                                @php
+                                    $q = $quantities[$item['category']] ?? 0;
+                                    if ($q < 1) continue;
+                                    $unitPrice = $item['sale_price'] ?? $item['price'] ?? 0;
+                                    $lineTotal = $unitPrice * $q;
+                                    $summaryRows[] = ['label' => $item['label'], 'qty' => $q, 'unitPrice' => $unitPrice, 'lineTotal' => $lineTotal];
+                                @endphp
+                            @endforeach
+                        @endif
 
                         <div class="mt-4 space-y-3 text-sm">
                             @if(count($summaryRows) > 0)
@@ -185,8 +230,11 @@
                         </div>
 
                         @if($totalGuests > 0)
+                            @php
+                                $label = $pricingType === 'fixed' ? ($totalGuests === 1 ? 'group' : 'groups') : ($totalGuests === 1 ? 'guest' : 'guests');
+                            @endphp
                             <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                                <span class="text-base font-bold text-gray-900">Total ({{ $totalGuests }} {{ $totalGuests === 1 ? 'guest' : 'guests' }})</span>
+                                <span class="text-base font-bold text-gray-900">Total ({{ $totalGuests }} {{ $label }})</span>
                                 <span class="text-xl font-bold text-primary-600">${{ number_format($grandTotal, 2) }}</span>
                             </div>
                         @endif

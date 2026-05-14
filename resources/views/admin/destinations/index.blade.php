@@ -48,11 +48,16 @@
                             <td class="px-6 py-4 text-gray-700">{{ $destination->sort_order ?? 0 }}</td>
                             <td class="px-6 py-4 text-gray-700">{{ $destination->tours->count() }}</td>
                             <td class="px-6 py-4">
-                                @if($destination->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
-                                @endif
+                                <div class="flex items-center gap-2">
+                                    @if($destination->is_active)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
+                                    @endif
+                                    @if($destination->is_popular)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Popular</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">

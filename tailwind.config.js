@@ -7,6 +7,11 @@ export default {
     ],
     theme: {
         extend: {
+            fontSize: {
+                'xs': '1.5rem',
+                'sm': '1.75rem',
+                'base': '2rem',
+            },
             fontFamily: {
                 sans: ['Poppins', 'sans-serif'],
             },

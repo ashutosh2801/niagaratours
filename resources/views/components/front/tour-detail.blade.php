@@ -1,5 +1,13 @@
-<div class="mt-5">
-    {{-- Hero Image Section --}}
+<div>
+    <section class="bg-gray-50 border-b border-gray-200">
+        <x-breadcrumbs :items="[
+            ['label' => 'Tours', 'url' => route('tours')],
+            ['label' => $tour->title ?? 'Tour'],
+        ]" />
+    </section>
+
+    <div class="mt-5">
+        {{-- Hero Image Section --}}
     @php
         $allImages = $tour->images ?? [];
         if ($tour->featured_image && !in_array($tour->featured_image, $allImages)) {
@@ -273,6 +281,13 @@
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Book This Tour</h3>
 
+                        @if(session('error'))
+                            <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+                                <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span class="text-sm text-red-700">{{ session('error') }}</span>
+                            </div>
+                        @endif
+
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Travel Date</label>
                             <input type="date" wire:model="travelDate" min="{{ date('Y-m-d') }}"
@@ -280,39 +295,66 @@
                         </div>
 
                         <div class="space-y-3 mb-4">
-                            @php
-                                $hasPricing = false;
-                            @endphp
-                            @foreach($pricing as $item)
-                                @if(!is_null($item['price']))
-                                    @php $hasPricing = true; @endphp
-                                    <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                                        <div>
-                                            <span class="text-sm font-medium text-gray-900">{{ $item['label'] }}</span>
-                                            <div class="text-xs text-gray-500">
-                                                @if(!is_null($item['sale_price']))
-                                                    <span class="text-primary-600 font-medium">${{ number_format($item['sale_price'], 2) }}</span>
-                                                    <span class="line-through ml-1">${{ number_format($item['price'], 2) }}</span>
-                                                @else
-                                                    <span class="text-gray-700">${{ number_format($item['price'], 2) }}</span>
-                                                @endif
-                                                @if(($item['min_qty'] ?? 0) > 0)
-                                                    <span class="ml-2 text-amber-600">(min {{ $item['min_qty'] }})</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-                                            <button type="button" wire:click="decrementQuantity('{{ $item['category'] }}')" class="px-2 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
-                                            </button>
-                                            <span class="px-3 py-1 text-sm font-medium text-gray-900 min-w-[2rem] text-center">{{ $quantities[$item['category']] ?? 0 }}</span>
-                                            <button type="button" wire:click="incrementQuantity('{{ $item['category'] }}')" class="px-2 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                            </button>
+                            @if($pricingType === 'fixed' && count($pricing) > 0 && !is_null($pricing[0]['price'] ?? null))
+                                @php $item = $pricing[0]; $hasPricing = true; @endphp
+                                <div class="flex items-center justify-between py-2">
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-900">Group Booking</span>
+                                        <div class="text-xs text-gray-500">
+                                            @if(!is_null($item['sale_price'] ?? null))
+                                                <span class="text-primary-600 font-medium">${{ number_format($item['sale_price'], 2) }}</span>
+                                                <span class="line-through ml-1">${{ number_format($item['price'], 2) }}</span>
+                                            @else
+                                                <span class="text-gray-700">${{ number_format($item['price'], 2) }}</span>
+                                            @endif
+                                            @if(($item['min_qty'] ?? 0) > 0)
+                                                <span class="ml-2 text-amber-600">(min {{ $item['min_qty'] }})</span>
+                                            @endif
                                         </div>
                                     </div>
-                                @endif
-                            @endforeach
+                                    <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                                        <button type="button" wire:click="decrementQuantity('{{ $item['category'] }}')" class="px-2 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                                        </button>
+                                        <span class="px-3 py-1 text-sm font-medium text-gray-900 min-w-[2rem] text-center">{{ $quantities[$item['category']] ?? 0 }}</span>
+                                        <button type="button" wire:click="incrementQuantity('{{ $item['category'] }}')" class="px-2 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            @else
+                                @php $hasPricing = false; @endphp
+                                @foreach($pricing as $item)
+                                    @if(!is_null($item['price']))
+                                        @php $hasPricing = true; @endphp
+                                        <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                                            <div>
+                                                <span class="text-sm font-medium text-gray-900">{{ $item['label'] }}</span>
+                                                <div class="text-xs text-gray-500">
+                                                    @if(!is_null($item['sale_price']))
+                                                        <span class="text-primary-600 font-medium">${{ number_format($item['sale_price'], 2) }}</span>
+                                                        <span class="line-through ml-1">${{ number_format($item['price'], 2) }}</span>
+                                                    @else
+                                                        <span class="text-gray-700">${{ number_format($item['price'], 2) }}</span>
+                                                    @endif
+                                                    @if(($item['min_qty'] ?? 0) > 0)
+                                                        <span class="ml-2 text-amber-600">(min {{ $item['min_qty'] }})</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                                                <button type="button" wire:click="decrementQuantity('{{ $item['category'] }}')" class="px-2 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                                                </button>
+                                                <span class="px-3 py-1 text-sm font-medium text-gray-900 min-w-[2rem] text-center">{{ $quantities[$item['category']] ?? 0 }}</span>
+                                                <button type="button" wire:click="incrementQuantity('{{ $item['category'] }}')" class="px-2 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            @endif
                         </div>
 
                         @if($hasPricing)
@@ -409,4 +451,5 @@
             </div>
         </section>
     @endif
+</div>
 </div>

@@ -13,6 +13,7 @@ class Destination extends Model
         'description',
         'image',
         'is_active',
+        'is_popular',
         'sort_order',
     ];
 
@@ -20,6 +21,7 @@ class Destination extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_popular' => 'boolean',
             'sort_order' => 'integer',
         ];
     }

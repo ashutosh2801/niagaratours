@@ -9,7 +9,7 @@
     use App\Models\Destination;
     $enabledSections = HomepageSection::where('is_enabled', true)->orderBy('sort_order')->get();
     $showCategories = Category::where('is_active', true)->orderBy('sort_order')->get();
-    $showDestinations = Destination::where('is_active', true)->orderBy('sort_order')->get();
+    $showDestinations = Destination::withCount(['tours' => fn($q) => $q->where('is_active', true)])->where('is_active', true)->where('is_popular', true)->orderBy('sort_order')->get();
 @endphp
 
 @section('hero')
@@ -115,6 +115,32 @@
                 </div>
             </section>
 
+        @elseif($section->key === 'browse_categories' && $settings && $showCategories->isNotEmpty())
+            <section class="py-16 {{ $loop->even ? 'bg-gray-50' : 'bg-white' }}">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900">{{ $settings['title'] ?? 'Browse by Category' }}</h2>
+                        @if(!empty($settings['subtitle']))
+                            <p class="mt-3 text-lg text-gray-600">{{ $settings['subtitle'] }}</p>
+                        @endif
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                        @foreach($showCategories as $cat)
+                            <a href="{{ route('tours', ['selectedCategories' => [$cat->id]]) }}" wire:navigate class="group flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-primary-200 transition-all">
+                                @if($cat->image)
+                                    <img src="{{ $cat->image }}" alt="{{ $cat->name }}" class="w-16 h-16 object-cover rounded-full mb-3">
+                                @else
+                                    <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-3">
+                                        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                                    </div>
+                                @endif
+                                <span class="text-sm font-medium text-gray-900 group-hover:text-primary-600 transition-colors">{{ $cat->name }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+
         @elseif($section->key === 'cta' && $settings)
             <section class="relative py-20 bg-cover bg-center" style="background-image: url('{{ $settings['background_image'] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}');">
                 <div class="absolute inset-0 bg-primary-900/70"></div>
@@ -130,11 +156,7 @@
                 </div>
             </section>
 
-        @elseif($section->key === 'popular_destinations' && $settings)
-            @php
-                $destIds = $settings['tour_ids'] ?? [];
-                $destTours = $destIds ? Tour::whereIn('id', $destIds)->where('is_active', true)->get() : collect();
-            @endphp
+        @elseif($section->key === 'popular_destinations' && $settings && $showDestinations->isNotEmpty())
             <section class="py-16 {{ $loop->even ? 'bg-gray-50' : 'bg-white' }}">
                 <div class="max-w-7xl mx-auto px-4">
                     <div class="text-center mb-12">
@@ -143,111 +165,27 @@
                             <p class="mt-3 text-lg text-gray-600">{{ $settings['subtitle'] }}</p>
                         @endif
                     </div>
-                    @if($destTours->isNotEmpty())
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            @foreach($destTours as $tour)
-                                <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate class="group relative h-64 rounded-xl overflow-hidden">
-                                    <img src="{{ $tour->featured_image ?? $tour->images[0] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" alt="{{ $tour->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                    <div class="absolute bottom-0 left-0 right-0 p-4">
-                                        <h3 class="text-white font-semibold text-lg">{{ $tour->title }}</h3>
-                                        <p class="text-primary-200 text-sm">From ${{ number_format($tour->sale_price ?? $tour->price, 2) }}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        @foreach($showDestinations as $dest)
+                            <a href="{{ route('tours', ['selectedDestinations' => [$dest->id]]) }}" wire:navigate class="group relative h-64 rounded-xl overflow-hidden">
+                                @if($dest->image)
+                                    <img src="{{ $dest->image }}" alt="{{ $dest->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                @else
+                                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     </div>
-                                </a>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <a href="{{ route('tours') }}" wire:navigate class="group relative h-64 rounded-xl overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Niagara Falls" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                @endif
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                                 <div class="absolute bottom-0 left-0 right-0 p-4">
-                                    <h3 class="text-white font-semibold text-lg">Niagara Falls</h3>
-                                    <p class="text-primary-200 text-sm">Explore Tours</p>
+                                    <h3 class="text-white font-semibold text-lg">{{ $dest->name }}</h3>
+                                    <p class="text-primary-200 text-sm">{{ $dest->tours_count }} tours</p>
                                 </div>
                             </a>
-                            <a href="{{ route('tours') }}" wire:navigate class="group relative h-64 rounded-xl overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1572274401328-0a7cb0d2c649?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Niagara-on-the-Lake" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                <div class="absolute bottom-0 left-0 right-0 p-4">
-                                    <h3 class="text-white font-semibold text-lg">Niagara-on-the-Lake</h3>
-                                    <p class="text-primary-200 text-sm">Explore Tours</p>
-                                </div>
-                            </a>
-                            <a href="{{ route('tours') }}" wire:navigate class="group relative h-64 rounded-xl overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Toronto" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                <div class="absolute bottom-0 left-0 right-0 p-4">
-                                    <h3 class="text-white font-semibold text-lg">Toronto</h3>
-                                    <p class="text-primary-200 text-sm">Explore Tours</p>
-                                </div>
-                            </a>
-                            <a href="{{ route('tours') }}" wire:navigate class="group relative h-64 rounded-xl overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Wine Country" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                <div class="absolute bottom-0 left-0 right-0 p-4">
-                                    <h3 class="text-white font-semibold text-lg">Wine Country</h3>
-                                    <p class="text-primary-200 text-sm">Explore Tours</p>
-                                </div>
-                            </a>
-                        </div>
-                    @endif
+                        @endforeach
+                    </div>
                 </div>
             </section>
         @endif
     @endforeach
 
-    @if($showCategories->isNotEmpty())
-        <section class="py-16 bg-gray-50">
-            <div class="max-w-7xl mx-auto px-4">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-900">Browse by Category</h2>
-                    <p class="mt-3 text-lg text-gray-600">Find the perfect tour for your style</p>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                    @foreach($showCategories as $cat)
-                        <a href="{{ route('tours', ['selectedCategories' => [$cat->id]]) }}" wire:navigate class="group flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-primary-200 transition-all">
-                            @if($cat->image)
-                                <img src="{{ $cat->image }}" alt="{{ $cat->name }}" class="w-16 h-16 object-cover rounded-full mb-3">
-                            @else
-                                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-3">
-                                    <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                                </div>
-                            @endif
-                            <span class="text-sm font-medium text-gray-900 group-hover:text-primary-600 transition-colors">{{ $cat->name }}</span>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
-
-    @if($showDestinations->isNotEmpty())
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-900">Popular Destinations</h2>
-                    <p class="mt-3 text-lg text-gray-600">Explore tours by destination</p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach($showDestinations as $dest)
-                        <a href="{{ route('tours', ['selectedDestinations' => [$dest->id]]) }}" wire:navigate class="group relative h-64 rounded-xl overflow-hidden">
-                            @if($dest->image)
-                                <img src="{{ $dest->image }}" alt="{{ $dest->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            @else
-                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                </div>
-                            @endif
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute bottom-0 left-0 right-0 p-4">
-                                <h3 class="text-white font-semibold text-lg">{{ $dest->name }}</h3>
-                                <p class="text-primary-200 text-sm">{{ $dest->tours()->where('is_active', true)->count() }} tours</p>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
 @endsection

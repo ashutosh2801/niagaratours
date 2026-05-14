@@ -6,7 +6,13 @@
         <span class="text-gray-900 font-medium">{{ $pageId ? 'Edit: ' . ($title ?? 'Page') : 'Create Page' }}</span>
     </nav>
     <div class="max-w-4xl">
-        <form wire:submit.prevent="save" class="space-y-6">
+        <form x-data="{
+            async saveForm() {
+                const input = document.querySelector('[data-summernote-content]');
+                if (input) await $wire.set('content', input.value);
+                $wire.save();
+            }
+        }" x-on:submit.prevent="saveForm()" class="space-y-6">
             <!-- Basic Information -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Page Details</h2>
@@ -41,7 +47,7 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Content</h2>
                 <div>
-                    <x-admin.trix-editor wire="content" :value="$content ?? ''" label="Page Content" :error="$errors->first('content')" />
+                    <x-admin.summernote-editor ref="content" :value="$content ?? ''" label="Page Content" :error="$errors->first('content')" />
                 </div>
             </div>
 

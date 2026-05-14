@@ -4,10 +4,13 @@ namespace App\Livewire\Front;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Setting;
 use App\Models\Tour;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Stripe\Checkout\Session;
+use Stripe\Stripe;
 
 class BookingForm extends Component
 {
@@ -101,8 +104,11 @@ class BookingForm extends Component
         $quantities = $this->bookingData['quantities'] ?? [];
 
         $totalGuests = array_sum($quantities);
+        $isFixed = $this->pricingType === 'fixed';
+
         if ($totalGuests < 1) {
-            $this->addError('travel_date', 'No guests selected. Please select at least one guest.');
+            $msg = $isFixed ? 'Please book at least one group.' : 'Please select at least one guest.';
+            $this->addError('travel_date', $msg);
             return;
         }
 
@@ -113,8 +119,10 @@ class BookingForm extends Component
         foreach ($categories as $item) {
             $qty = $quantities[$item['category']] ?? 0;
             $minQty = $item['min_qty'] ?? 0;
-            if ($qty > 0 && $qty < $minQty) {
-                $this->addError('travel_date', $item['label'] . ' requires a minimum of ' . $minQty . ' guests.');
+            if ($minQty > 0 && $qty < $minQty) {
+                $label = $isFixed ? 'Group booking' : $item['label'];
+                $noun = $isFixed ? 'groups' : 'guests';
+                $this->addError('travel_date', $label . ' requires a minimum of ' . $minQty . ' ' . $noun . '.');
                 return;
             }
             if ($qty < 1) continue;
@@ -125,7 +133,7 @@ class BookingForm extends Component
 
             $orderItemsData[] = [
                 'category' => $item['category'],
-                'label' => $item['label'],
+                'label' => $isFixed ? 'Group Booking' : $item['label'],
                 'price' => $price,
                 'quantity' => $qty,
                 'line_total' => $lineTotal,
@@ -156,7 +164,7 @@ class BookingForm extends Component
             OrderItem::create([
                 'order_id' => $order->id,
                 'tour_id' => $tour->id,
-                'tour_title' => $tour->title . ' (' . $item['label'] . ')',
+                'tour_title' => $tour->title . ($isFixed ? ' (Group Booking)' : ' (' . $item['label'] . ')'),
                 'price' => $item['price'],
                 'quantity' => $item['quantity'],
                 'subtotal' => $item['line_total'],
@@ -171,6 +179,50 @@ class BookingForm extends Component
 
         session()->forget('booking_data');
 
+        $stripeSecret = trim(Setting::get('stripe_secret') ?: config('services.stripe.secret', ''));
+        $stripeKey = trim(Setting::get('stripe_key') ?: config('services.stripe.key', ''));
+
+        if ($stripeSecret && $stripeKey) {
+            try {
+                Stripe::setApiKey($stripeSecret);
+
+                $lineItems = [];
+                foreach ($orderItemsData as $item) {
+                    $lineItems[] = [
+                        'price_data' => [
+                            'currency' => 'usd',
+                            'product_data' => [
+                                'name' => $tour->title . ' - ' . $item['label'],
+                            ],
+                            'unit_amount' => (int) (round($item['price'], 2) * 100),
+                        ],
+                        'quantity' => $item['quantity'],
+                    ];
+                }
+
+                $session = Session::create([
+                    'mode' => 'payment',
+                    'line_items' => $lineItems,
+                    'customer_email' => $this->customer_email,
+                    'metadata' => [
+                        'order_number' => $order->order_number,
+                    ],
+                    'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
+                    'cancel_url' => route('stripe.cancel'),
+                ]);
+
+                $order->update(['travel_details' => array_merge($order->travel_details ?? [], [
+                    'stripe_session_id' => $session->id,
+                ])]);
+
+                $this->js("window.location.href = " . json_encode($session->url));
+                return;
+            } catch (\Exception $e) {
+                $this->addError('travel_date', 'Payment error: ' . $e->getMessage());
+                return;
+            }
+        }
+
         $this->orderNumber = $order->order_number;
         $this->bookingConfirmed = true;
     }
@@ -180,6 +232,10 @@ class BookingForm extends Component
         $tour = Tour::find($this->tour_id);
         return view('components.front.booking-form', [
             'tour' => $tour,
+            'subtotal' => $this->subtotal,
+            'serviceFee' => $this->serviceFee,
+            'grandTotal' => $this->grandTotal,
+            'totalGuests' => $this->totalGuests,
         ]);
     }
 }

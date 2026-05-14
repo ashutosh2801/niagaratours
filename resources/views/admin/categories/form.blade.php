@@ -55,12 +55,16 @@
                             </button>
                         </div>
                     @endif
-                    <input type="file" wire:model="image" accept="image/*"
-                           class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-600 hover:file:bg-primary-100">
-                    @error('image') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    <button type="button" x-data @click="$dispatch('openMediaPicker')"
+                            class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Media Library
+                    </button>
                 </div>
             </div>
         </div>
+
+        <livewire:admin.media-picker />
 
         <div class="flex items-center justify-end gap-3">
             <a href="{{ route('admin.categories') }}" wire:navigate class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</a>

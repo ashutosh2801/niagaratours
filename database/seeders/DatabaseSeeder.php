@@ -46,8 +46,8 @@ class DatabaseSeeder extends Seeder
 
         // Destinations
         $destinations = [
-            ['name' => 'Niagara Falls', 'slug' => 'niagara-falls', 'description' => 'Experience the majesty of Niagara Falls', 'sort_order' => 1],
-            ['name' => 'Niagara-on-the-Lake', 'slug' => 'niagara-on-the-lake', 'description' => 'Charming historic town with wineries', 'sort_order' => 2],
+            ['name' => 'Niagara Falls', 'slug' => 'niagara-falls', 'description' => 'Experience the majesty of Niagara Falls', 'is_popular' => true, 'sort_order' => 1],
+            ['name' => 'Niagara-on-the-Lake', 'slug' => 'niagara-on-the-lake', 'description' => 'Charming historic town with wineries', 'is_popular' => true, 'sort_order' => 2],
             ['name' => 'Toronto', 'slug' => 'toronto', 'description' => 'Canada\'s largest city', 'sort_order' => 3],
             ['name' => 'Wine Country', 'slug' => 'wine-country', 'description' => 'World-class wineries and vineyards', 'sort_order' => 4],
         ];

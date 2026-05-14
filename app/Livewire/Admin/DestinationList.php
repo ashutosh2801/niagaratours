@@ -15,6 +15,12 @@ class DestinationList extends Component
     use WithPagination;
 
     public $search = '';
+    public $popular = false;
+
+    public function mount()
+    {
+        $this->popular = request()->query('popular', false);
+    }
 
     public function delete($id)
     {
@@ -24,10 +30,13 @@ class DestinationList extends Component
 
     public function render()
     {
-        $destinations = Destination::where('name', 'like', '%'.$this->search.'%')
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->paginate(10);
+        $query = Destination::where('name', 'like', '%'.$this->search.'%');
+
+        if ($this->popular) {
+            $query->where('is_popular', true);
+        }
+
+        $destinations = $query->orderBy('sort_order')->orderBy('name')->paginate(10);
 
         return view('admin.destinations.index', compact('destinations'));
     }

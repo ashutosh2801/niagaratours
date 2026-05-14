@@ -30,6 +30,8 @@ class SettingSeeder extends Seeder
             'aws_secret' => '',
             'aws_region' => 'us-east-1',
             'aws_bucket' => '',
+            'stripe_key' => '',
+            'stripe_secret' => '',
         ];
 
         foreach ($defaults as $key => $value) {

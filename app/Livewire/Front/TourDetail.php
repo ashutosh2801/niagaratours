@@ -94,11 +94,16 @@ class TourDetail extends Component
         }
 
         $pricing = $tour->pricing_categories;
+        $pricingType = $tour->pricing_type;
+        $isFixed = $pricingType === 'fixed';
+
         foreach ($pricing as $item) {
             $qty = $this->quantities[$item['category']] ?? 0;
             $min = $item['min_qty'] ?? 0;
-            if ($qty > 0 && $qty < $min) {
-                session()->flash('error', $item['label'] . ' requires a minimum of ' . $min . ' guests.');
+            if ($min > 0 && $qty < $min) {
+                $label = $isFixed ? 'Group booking' : $item['label'];
+                $noun = $isFixed ? 'groups' : 'guests';
+                session()->flash('error', $label . ' requires a minimum of ' . $min . ' ' . $noun . '.');
                 return;
             }
         }
@@ -130,6 +135,9 @@ class TourDetail extends Component
             'tour' => $tour,
             'pricing' => $pricing,
             'pricingType' => $pricingType,
+            'subtotal' => $this->subtotal,
+            'tax' => $this->tax,
+            'total' => $this->total,
         ]);
     }
 }

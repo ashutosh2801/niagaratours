@@ -34,6 +34,8 @@ class SectionList extends Component
     public $popToursTitle;
     public $popToursSubtitle;
     public $selectedPopularTours = [];
+    public $browseTitle;
+    public $browseSubtitle;
 
     public function mount()
     {
@@ -70,6 +72,11 @@ class SectionList extends Component
             $this->popTitle = $pop->settings['title'] ?? 'Popular Destinations';
             $this->popSubtitle = $pop->settings['subtitle'] ?? '';
             $this->selectedTours = $pop->settings['tour_ids'] ?? [];
+        }
+
+        if ($bc = $sections->get('browse_categories')) {
+            $this->browseTitle = $bc->settings['title'] ?? 'Browse by Category';
+            $this->browseSubtitle = $bc->settings['subtitle'] ?? '';
         }
 
         if ($pt = $sections->get('popular_tours')) {
@@ -176,6 +183,10 @@ class SectionList extends Component
                 'title' => $this->popToursTitle,
                 'subtitle' => $this->popToursSubtitle,
                 'tour_ids' => array_map('intval', $this->selectedPopularTours),
+            ],
+            'browse_categories' => [
+                'title' => $this->browseTitle,
+                'subtitle' => $this->browseSubtitle,
             ],
             default => [],
         };

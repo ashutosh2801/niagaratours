@@ -6,19 +6,10 @@
     display: none !important;
 }
 
-trix-toolbar {
-    border: 1px solid #d1d5db;
-    border-bottom: 0;
-    border-radius: 0.5rem 0.5rem 0 0;
-    background: #f9fafb;
-    padding: 4px;
+body {
+    font-size: 200%;
 }
-trix-editor {
-    border: 1px solid #d1d5db;
-    border-radius: 0 0 0.5rem 0.5rem;
-    min-height: 12rem;
-    padding: 1rem;
-}
-trix-toolbar + trix-editor {
-    border-top: 0;
+
+h1, h2, h3, h4, h5, h6 {
+    font-size: 1rem;
 }

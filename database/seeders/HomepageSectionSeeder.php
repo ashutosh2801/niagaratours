@@ -95,5 +95,16 @@ class HomepageSectionSeeder extends Seeder
                 'tour_ids' => [1, 2, 3],
             ],
         ]);
+
+        HomepageSection::create([
+            'key' => 'browse_categories',
+            'title' => 'Browse by Category',
+            'is_enabled' => true,
+            'sort_order' => 6,
+            'settings' => [
+                'title' => 'Browse by Category',
+                'subtitle' => 'Find the perfect tour for your style',
+            ],
+        ]);
     }
 }

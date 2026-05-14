@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StripeController;
 use App\Livewire\Front\TourDetail;
 use App\Livewire\Front\BookingForm;
 use App\Livewire\Admin\TourList;
@@ -26,6 +27,10 @@ Route::view('/booking-confirmation', 'front.booking-confirmation')->name('bookin
 Route::view('/about', 'front.about')->name('about');
 Route::view('/contact', 'front.contact')->name('contact');
 Route::get('/page/{page}', App\Livewire\Front\PageShow::class)->name('page.show');
+
+Route::get('/stripe/success', [StripeController::class, 'success'])->name('stripe.success');
+Route::get('/stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
 
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardStats::class)->name('dashboard');

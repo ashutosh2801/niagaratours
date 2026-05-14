@@ -31,6 +31,8 @@ class SiteSettings extends Component
     public $aws_secret;
     public $aws_region;
     public $aws_bucket;
+    public $stripe_key;
+    public $stripe_secret;
 
     protected $listeners = ['mediaSelected' => 'setMedia'];
 
@@ -62,6 +64,7 @@ class SiteSettings extends Component
             'social_facebook', 'social_twitter', 'social_instagram', 'social_youtube',
             'logo', 'favicon',
             'storage_disk', 'aws_key', 'aws_secret', 'aws_region', 'aws_bucket',
+            'stripe_key', 'stripe_secret',
         ];
         foreach ($keys as $key) {
             $this->$key = Setting::get($key, '');
@@ -96,6 +99,8 @@ class SiteSettings extends Component
             'aws_secret' => $this->aws_secret,
             'aws_region' => $this->aws_region,
             'aws_bucket' => $this->aws_bucket,
+            'stripe_key' => $this->stripe_key,
+            'stripe_secret' => $this->stripe_secret,
         ];
 
         foreach ($data as $key => $value) {
