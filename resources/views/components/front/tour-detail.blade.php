@@ -1,30 +1,130 @@
-<div>
+<div class="mt-5">
     {{-- Hero Image Section --}}
     @php
         $allImages = $tour->images ?? [];
         if ($tour->featured_image && !in_array($tour->featured_image, $allImages)) {
             array_unshift($allImages, $tour->featured_image);
         }
+        $mainImage = $allImages[0] ?? null;
+        $thumbImages = array_slice($allImages, 1, 4);
+        $remainingCount = count($allImages) - 5;
     @endphp
-    <div class="relative bg-gray-900 max-w-7xl mx-auto" x-data="{ selected: '{{ ($allImages[0] ?? '') }}' }">
-        <div class="aspect-[21/9] max-h-[33rem] overflow-hidden">
-            @if(!empty($allImages[0]))
-                <img :src="selected" src="{{ $allImages[0] }}" alt="{{ $tour->title }}" class="w-full h-full object-cover">
-            @else
-                <div class="w-full h-full bg-gradient-to-br from-primary-800 to-purple-900"></div>
+    <div class="relative max-w-7xl mx-auto"
+         x-data="{ galleryOpen: false, currentIndex: 0, images: {{ json_encode($allImages) }} }"
+         @keydown.window.escape="galleryOpen = false"
+         @keydown.window.left="currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1"
+         @keydown.window.right="currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0">
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-2 h-[300px] lg:h-[400px]">
+            {{-- Main large image --}}
+            <div class="lg:col-span-3 relative overflow-hidden rounded-lg bg-gray-900 h-full">
+                @if($mainImage)
+                    <img src="{{ $mainImage }}" alt="{{ $tour->title }}" class="w-full h-full object-cover cursor-pointer" @click="galleryOpen = true; currentIndex = 0">
+                @else
+                    <div class="w-full h-full bg-gradient-to-br from-primary-800 to-purple-900"></div>
+                @endif
+            </div>
+
+            {{-- Thumbnails grid (right side) --}}
+            @if(count($thumbImages) > 0)
+                <div class="hidden lg:grid grid-cols-2 gap-2 h-full">
+                    @foreach($thumbImages as $index => $img)
+                        <div class="relative overflow-hidden rounded-lg bg-gray-900 cursor-pointer group h-full"
+                             @click="galleryOpen = true; currentIndex = {{ $index + 1 }}">
+                            <img src="{{ $img }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            @if($index === 3 && $remainingCount > 0)
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                    <span class="text-white text-lg font-bold">+{{ $remainingCount }} more</span>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                    {{-- Fill remaining slots --}}
+                    @for($i = count($thumbImages); $i < 4; $i++)
+                        <div class="rounded-lg bg-gradient-to-br from-gray-700 to-gray-900 h-full"></div>
+                    @endfor
+                </div>
             @endif
-            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent pointer-events-none"></div>
         </div>
 
+        {{-- View all photos button --}}
         @if(count($allImages) > 1)
-            <div class="absolute bottom-4 left-4 right-4 flex gap-2 overflow-x-auto pb-1 z-10">
-                @foreach($allImages as $img)
-                    <div @click="selected = '{{ $img }}'" :class="{ 'border-primary-400 ring-2 ring-primary-500': selected === '{{ $img }}', 'border-white/30': selected !== '{{ $img }}' }" class="w-20 h-14 rounded-lg overflow-hidden border-2 shrink-0 cursor-pointer hover:opacity-90 transition-all">
+            <button @click="galleryOpen = true; currentIndex = 0"
+                    class="absolute bottom-4 right-4 px-4 py-2 bg-white/90 hover:bg-white text-gray-900 text-sm font-medium rounded-lg shadow-md transition-colors z-10 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                View all photos ({{ count($allImages) }})
+            </button>
+        @endif
+
+        {{-- Mobile thumbnails row --}}
+        @if(count($thumbImages) > 0)
+            <div class="flex gap-2 mt-2 overflow-x-auto pb-1 lg:hidden">
+                @foreach($thumbImages as $index => $img)
+                    <div class="w-20 h-14 shrink-0 rounded-lg overflow-hidden cursor-pointer" @click="galleryOpen = true; currentIndex = {{ $index + 1 }}">
                         <img src="{{ $img }}" alt="" class="w-full h-full object-cover">
                     </div>
                 @endforeach
+                @if($remainingCount > 0)
+                    <div class="w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-black/80 flex items-center justify-center cursor-pointer" @click="galleryOpen = true; currentIndex = 4">
+                        <span class="text-white text-xs font-bold">+{{ $remainingCount }}</span>
+                    </div>
+                @endif
             </div>
         @endif
+
+        {{-- Gallery Modal --}}
+        <div x-show="galleryOpen"
+             x-cloak
+             class="fixed inset-0 z-50 bg-black/70 flex items-center justify-center"
+             x-transition.opacity.duration.300ms
+             @click.self="galleryOpen = false">
+
+            {{-- Close --}}
+            <button @click="galleryOpen = false" class="absolute top-4 right-4 text-white/80 hover:text-white z-10 transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            {{-- Counter --}}
+            <div class="absolute top-6 left-1/2 -translate-x-1/2 text-white/80 text-sm font-medium z-10" x-text="`${currentIndex + 1} / ${images.length}`"></div>
+
+            {{-- Previous --}}
+            <button @click="currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors backdrop-blur-sm">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                <span class="text-sm font-medium hidden md:inline">Previous</span>
+            </button>
+
+            {{-- Image --}}
+            <div class="flex items-center justify-center w-full h-full p-16">
+                <img :src="images[currentIndex]" alt="" class="max-w-full max-h-full object-contain">
+            </div>
+
+            {{-- Next --}}
+            <button @click="currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors backdrop-blur-sm">
+                <span class="text-sm font-medium hidden md:inline">Next</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+
+            {{-- Thumbnail strip at bottom --}}
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 max-w-[90vw] overflow-x-auto pb-1 z-10">
+                <template x-for="(img, index) in images" :key="index">
+                    <div @click="currentIndex = index"
+                         :class="{ 'ring-2 ring-white ring-offset-2 ring-offset-black': currentIndex === index, 'opacity-60 hover:opacity-100': currentIndex !== index }"
+                         class="w-16 h-10 shrink-0 rounded overflow-hidden cursor-pointer transition-all">
+                        <img :src="img" alt="" class="w-full h-full object-cover">
+                    </div>
+                </template>
+            </div>
+        </div>
     </div>
 
     {{-- Tour Info Header --}}
@@ -58,6 +158,10 @@
                 </div>
 
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $tour->title }}</h1>
+
+                @if(isset($tour->short_description) && $tour->short_description)
+                    <p class="mt-4 text-lg text-gray-600">{{ $tour->short_description }}</p>
+                @endif
 
                 {{-- Content Sections --}}
                 <div class="mt-8 space-y-10">
@@ -191,6 +295,9 @@
                                                     <span class="line-through ml-1">${{ number_format($item['price'], 2) }}</span>
                                                 @else
                                                     <span class="text-gray-700">${{ number_format($item['price'], 2) }}</span>
+                                                @endif
+                                                @if(($item['min_qty'] ?? 0) > 0)
+                                                    <span class="ml-2 text-amber-600">(min {{ $item['min_qty'] }})</span>
                                                 @endif
                                             </div>
                                         </div>

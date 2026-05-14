@@ -26,6 +26,11 @@ class SiteSettings extends Component
     public $social_youtube;
     public $logo;
     public $favicon;
+    public $storage_disk;
+    public $aws_key;
+    public $aws_secret;
+    public $aws_region;
+    public $aws_bucket;
 
     protected $listeners = ['mediaSelected' => 'setMedia'];
 
@@ -56,6 +61,7 @@ class SiteSettings extends Component
             'contact_email', 'contact_phone', 'contact_address',
             'social_facebook', 'social_twitter', 'social_instagram', 'social_youtube',
             'logo', 'favicon',
+            'storage_disk', 'aws_key', 'aws_secret', 'aws_region', 'aws_bucket',
         ];
         foreach ($keys as $key) {
             $this->$key = Setting::get($key, '');
@@ -85,6 +91,11 @@ class SiteSettings extends Component
             'social_youtube' => $this->social_youtube,
             'logo' => $this->logo,
             'favicon' => $this->favicon,
+            'storage_disk' => $this->storage_disk,
+            'aws_key' => $this->aws_key,
+            'aws_secret' => $this->aws_secret,
+            'aws_region' => $this->aws_region,
+            'aws_bucket' => $this->aws_bucket,
         ];
 
         foreach ($data as $key => $value) {

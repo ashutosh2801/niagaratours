@@ -72,23 +72,59 @@ class Tour extends Model
     public function getPricingDefaultsAttribute(): array
     {
         return [
-            ['category' => 'adult', 'label' => 'Adult', 'price' => null, 'sale_price' => null],
-            ['category' => 'senior', 'label' => 'Senior', 'price' => null, 'sale_price' => null],
-            ['category' => 'child', 'label' => 'Child', 'price' => null, 'sale_price' => null],
-            ['category' => 'infant', 'label' => 'Infant', 'price' => null, 'sale_price' => null],
-            ['category' => 'group', 'label' => 'Group Tour', 'price' => null, 'sale_price' => null],
+            'type' => 'per_person',
+            'categories' => [
+                ['category' => 'adult', 'label' => 'Adult', 'price' => null, 'sale_price' => null, 'min_qty' => 1],
+            ],
         ];
+    }
+
+    public function getPricingCategoriesAttribute(): array
+    {
+        $raw = $this->pricing;
+        if (is_array($raw) && isset($raw['type'])) {
+            return $raw['categories'] ?? [];
+        }
+        if (is_array($raw) && isset($raw[0])) {
+            return collect($raw)->map(fn($item) => [
+                'category' => $item['category'] ?? '',
+                'label' => $item['label'] ?? '',
+                'price' => $item['price'] ?? null,
+                'sale_price' => $item['sale_price'] ?? null,
+                'min_qty' => $item['min_qty'] ?? 0,
+            ])->values()->toArray();
+        }
+        return [];
+    }
+
+    public function getPricingTypeAttribute(): string
+    {
+        $raw = $this->pricing;
+        if (is_array($raw) && isset($raw['type'])) {
+            return $raw['type'];
+        }
+        return 'per_person';
     }
 
     public function getStartingPriceAttribute(): ?float
     {
-        $prices = collect($this->pricing ?? $this->pricingDefaults)
+        $prices = collect($this->pricing_categories)
             ->pluck('sale_price')
-            ->merge(collect($this->pricing ?? $this->pricingDefaults)->pluck('price'))
+            ->merge(collect($this->pricing_categories)->pluck('price'))
             ->filter(fn($v) => !is_null($v) && $v > 0)
             ->sort()
             ->values();
 
         return $prices->first();
+    }
+
+    public function getRatingAttribute(): float
+    {
+        return 5.0;
+    }
+
+    public function getReviewCountAttribute(): int
+    {
+        return $this->orderItems()->count() ?: 0;
     }
 }

@@ -5,7 +5,10 @@
 @section('content')
     <!-- Page Header -->
     <section class="bg-gray-50 border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-16 text-center">
+        <x-breadcrumbs :items="[
+            ['label' => 'About Us'],
+        ]" />
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 text-center">
             <h1 class="text-4xl font-bold text-gray-900 mb-4">About Niagara Tours</h1>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto">Creating unforgettable Niagara Falls experiences since 2010. We are passionate about sharing the wonder of one of the world's greatest natural treasures.</p>
         </div>

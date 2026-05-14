@@ -60,12 +60,61 @@
                                 <input type="date" id="travel_date" wire:model="travel_date" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent @error('travel_date') border-red-400 @enderror">
                                 @error('travel_date') <span class="mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
                             </div>
-                            <div>
-                                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
-                                <input type="number" id="quantity" wire:model="quantity" min="1" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent @error('quantity') border-red-400 @enderror">
-                                @error('quantity') <span class="mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
-                            </div>
                         </div>
+
+                        @if(count($pricingCategories) > 0)
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="block text-sm font-medium text-gray-700">Pricing &amp; Guests</label>
+                                    @if($pricingType === 'fixed')
+                                        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Group Tour (Fixed Price)</span>
+                                    @else
+                                        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Per Person Pricing</span>
+                                    @endif
+                                </div>
+                                <div class="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-200">
+                                    @php $quantities = $bookingData['quantities'] ?? []; @endphp
+                                    @foreach($pricingCategories as $item)
+                                        @if(is_null($item['price'])) @continue @endif
+                                        @php
+                                            $qty = $quantities[$item['category']] ?? 0;
+                                            $hasSale = !is_null($item['sale_price']);
+                                            $displayPrice = $hasSale ? $item['sale_price'] : $item['price'];
+                                            $minQty = $item['min_qty'] ?? 0;
+                                        @endphp
+                                        <div class="flex items-center justify-between px-4 py-3 {{ $qty > 0 ? 'bg-primary-50/40' : 'bg-white' }}">
+                                            <div class="min-w-0 flex-1">
+                                                <span class="text-sm font-medium text-gray-900">{{ $item['label'] }}</span>
+                                                <div class="text-xs">
+                                                    @if($hasSale)
+                                                        <span class="text-primary-600 font-medium">${{ number_format($item['sale_price'], 2) }}</span>
+                                                        <span class="text-gray-400 line-through ml-1">${{ number_format($item['price'], 2) }}</span>
+                                                    @else
+                                                        <span class="text-gray-500">${{ number_format($item['price'], 2) }}</span>
+                                                    @endif
+                                                    @if($minQty > 0)
+                                                        <span class="text-amber-600 ml-1">(min {{ $minQty }})</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden shrink-0 ml-3">
+                                                <button type="button" wire:click="decrementQuantity('{{ $item['category'] }}')" class="px-2 py-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                                                </button>
+                                                <span class="px-3 py-1.5 text-sm font-medium text-gray-900 min-w-[2rem] text-center tabular-nums">{{ $qty }}</span>
+                                                <button type="button" wire:click="incrementQuantity('{{ $item['category'] }}')" class="px-2 py-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                @php $totalSelected = array_sum($quantities); @endphp
+                                @if($totalSelected < 1)
+                                    <p class="mt-2 text-sm text-red-500">Please select at least one guest.</p>
+                                @endif
+                            </div>
+                        @endif
 
                         <div>
                             <label for="special_requests" class="block text-sm font-medium text-gray-700 mb-1">Special Requests (optional)</label>
@@ -93,26 +142,38 @@
                             @endif
                             <div>
                                 <p class="font-semibold text-gray-900">{{ $tour->title }}</p>
-                                <p class="text-sm text-gray-500">${{ number_format($tour->price, 2) }} per person</p>
+                                @if($pricingType === 'fixed')
+                                    <p class="text-sm text-gray-500">Group tour (fixed price)</p>
+                                @else
+                                    <p class="text-sm text-gray-500">Per person pricing</p>
+                                @endif
                             </div>
                         </div>
 
                         @php
-                            $qty = $quantity ?? 1;
-                            $subtotal = $tour->price * $qty;
-                            $serviceFee = $subtotal * 0.05;
-                            $total = $subtotal + $serviceFee;
+                            $quantities = $bookingData['quantities'] ?? [];
+                            $summaryRows = [];
                         @endphp
+                        @foreach($pricingCategories as $item)
+                            @php
+                                $q = $quantities[$item['category']] ?? 0;
+                                if ($q < 1) continue;
+                                $unitPrice = $item['sale_price'] ?? $item['price'] ?? 0;
+                                $lineTotal = $unitPrice * $q;
+                                $summaryRows[] = ['label' => $item['label'], 'qty' => $q, 'unitPrice' => $unitPrice, 'lineTotal' => $lineTotal];
+                            @endphp
+                        @endforeach
 
                         <div class="mt-4 space-y-3 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Price per person</span>
-                                <span class="text-gray-900">${{ number_format($tour->price, 2) }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Quantity</span>
-                                <span class="text-gray-900">{{ $qty }}</span>
-                            </div>
+                            @if(count($summaryRows) > 0)
+                                @foreach($summaryRows as $row)
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">{{ $row['label'] }} × {{ $row['qty'] }}</span>
+                                        <span class="text-gray-900">${{ number_format($row['unitPrice'], 2) }}</span>
+                                    </div>
+                                @endforeach
+                                <div class="border-t border-gray-100 pt-2"></div>
+                            @endif
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Subtotal</span>
                                 <span class="text-gray-900">${{ number_format($subtotal, 2) }}</span>
@@ -123,10 +184,12 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                            <span class="text-base font-bold text-gray-900">Total</span>
-                            <span class="text-xl font-bold text-primary-600">${{ number_format($total, 2) }}</span>
-                        </div>
+                        @if($totalGuests > 0)
+                            <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                <span class="text-base font-bold text-gray-900">Total ({{ $totalGuests }} {{ $totalGuests === 1 ? 'guest' : 'guests' }})</span>
+                                <span class="text-xl font-bold text-primary-600">${{ number_format($grandTotal, 2) }}</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

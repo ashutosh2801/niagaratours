@@ -1,4 +1,12 @@
-    <div class="max-w-4xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-primary-600 transition-colors">Dashboard</a>
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <a href="{{ route('admin.tours') }}" wire:navigate class="hover:text-primary-600 transition-colors">Tours</a>
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <span class="text-gray-900 font-medium">{{ $tourId ? 'Edit: ' . ($title ?? 'Tour') : 'Create Tour' }}</span>
+        </nav>
+        <div class="max-w-4xl">
         <form wire:submit.prevent="save" class="space-y-6">
             <!-- Basic Information -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -84,33 +92,72 @@
             <!-- Pricing -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Pricing</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-200">
-                                <th class="text-left py-2 pr-4 font-medium text-gray-700">Category</th>
-                                <th class="text-left py-2 pr-4 font-medium text-gray-700">Price ($)</th>
-                                <th class="text-left py-2 font-medium text-gray-700">Sale Price ($)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($pricing ?? [] as $index => $item)
-                                <tr wire:key="pricing-{{ $index }}" class="border-b border-gray-100">
-                                    <td class="py-3 pr-4 font-medium text-gray-900">{{ $item['label'] ?? ucfirst($item['category']) }}</td>
-                                    <td class="py-3 pr-4">
-                                        <input type="number" wire:model="pricing.{{ $index }}.price" step="0.01" min="0" placeholder="0.00"
-                                               class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                    </td>
-                                    <td class="py-3">
-                                        <input type="number" wire:model="pricing.{{ $index }}.sale_price" step="0.01" min="0" placeholder="0.00"
-                                               class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                    </td>
+
+                <div x-data="{ type: $wire.$entangle('pricingType') }">
+                    <div class="flex items-center gap-6 mb-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="pricingType" value="per_person" x-model="type"
+                                   class="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500">
+                            <span class="text-sm font-medium text-gray-700">By Person</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="pricingType" value="fixed" x-model="type"
+                                   class="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500">
+                            <span class="text-sm font-medium text-gray-700">By Fixed (Group Tour)</span>
+                        </label>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-2 pr-4 font-medium text-gray-700">Label</th>
+                                    <th class="text-left py-2 pr-4 font-medium text-gray-700">Price ($)</th>
+                                    <th class="text-left py-2 pr-4 font-medium text-gray-700">Sale Price ($)</th>
+                                    <th class="text-left py-2 pr-4 font-medium text-gray-700">Min Qty</th>
+                                    <th class="text-left py-2 font-medium text-gray-700"></th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($pricing ?? [] as $index => $item)
+                                    <tr wire:key="pricing-{{ $index }}" class="border-b border-gray-100">
+                                        <td class="py-3 pr-4">
+                                            <input type="text" wire:model="pricing.{{ $index }}.label" placeholder="Adult"
+                                                   class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                            <input type="hidden" wire:model="pricing.{{ $index }}.category">
+                                        </td>
+                                        <td class="py-3 pr-4">
+                                            <input type="number" wire:model="pricing.{{ $index }}.price" step="0.01" min="0" placeholder="0.00"
+                                                   class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </td>
+                                        <td class="py-3 pr-4">
+                                            <input type="number" wire:model="pricing.{{ $index }}.sale_price" step="0.01" min="0" placeholder="0.00"
+                                                   class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </td>
+                                        <td class="py-3 pr-4">
+                                            <input type="number" wire:model="pricing.{{ $index }}.min_qty" min="0" placeholder="0"
+                                                   class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </td>
+                                        <td class="py-3">
+                                            <button type="button" wire:click="removePricingRow({{ $index }})"
+                                                    class="p-1.5 text-gray-400 hover:text-red-600 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <button type="button" wire:click="addPricingRow"
+                            class="mt-3 text-sm font-medium text-primary-600 hover:text-primary-700">
+                        + Add Category
+                    </button>
                 </div>
+
                 @error('pricing.*.price') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                @error('pricing.*.label') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
 
             <!-- Status -->
@@ -330,3 +377,4 @@
 
         <livewire:admin.media-picker />
     </div>
+</div>

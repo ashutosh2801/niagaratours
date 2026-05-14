@@ -26,6 +26,7 @@ class TourForm extends Component
     public $price;
     public $sale_price;
     public $max_people;
+    public $pricingType = 'per_person';
     public $pricing = [];
     public $images = [];
     public $featured_image;
@@ -58,8 +59,8 @@ class TourForm extends Component
     {
         $this->tourId = $tourId;
 
-        $defaultPricing = (new Tour)->pricingDefaults;
-        $this->pricing = $defaultPricing;
+        $this->pricingType = 'per_person';
+        $this->pricing = [['category' => 'adult', 'label' => 'Adult', 'price' => null, 'sale_price' => null, 'min_qty' => 1]];
 
         if ($this->tourId) {
             $tour = Tour::findOrFail($this->tourId);
@@ -74,7 +75,6 @@ class TourForm extends Component
             $this->price = $tour->price;
             $this->sale_price = $tour->sale_price;
             $this->max_people = $tour->max_people;
-            $this->pricing = $tour->pricing ?? $defaultPricing;
             $this->images = $tour->images ?: [];
             $this->featured_image = $tour->featured_image;
             $this->highlights = $tour->highlights ?: [];
@@ -88,6 +88,21 @@ class TourForm extends Component
             $this->booking_url = $tour->booking_url;
             $this->meta_title = $tour->meta_title;
             $this->meta_description = $tour->meta_description;
+
+            $raw = $tour->pricing;
+            if (is_array($raw) && isset($raw['type'])) {
+                $this->pricingType = $raw['type'];
+                $this->pricing = $raw['categories'] ?? [];
+            } elseif (is_array($raw) && isset($raw[0])) {
+                $this->pricingType = 'per_person';
+                $this->pricing = collect($raw)->map(fn($item) => [
+                    'category' => $item['category'] ?? Str::slug($item['label'] ?? ''),
+                    'label' => $item['label'] ?? '',
+                    'price' => $item['price'] ?? null,
+                    'sale_price' => $item['sale_price'] ?? null,
+                    'min_qty' => $item['min_qty'] ?? 0,
+                ])->values()->toArray();
+            }
         }
     }
 
@@ -167,6 +182,16 @@ class TourForm extends Component
         array_splice($this->faqs, $index, 1);
     }
 
+    public function addPricingRow()
+    {
+        $this->pricing[] = ['category' => '', 'label' => '', 'price' => null, 'sale_price' => null, 'min_qty' => 0];
+    }
+
+    public function removePricingRow($index)
+    {
+        array_splice($this->pricing, $index, 1);
+    }
+
     public function save()
     {
         $this->validate([
@@ -176,16 +201,31 @@ class TourForm extends Component
             'location' => 'nullable|string|max:255',
             'duration' => 'nullable|integer|min:1',
             'duration_type' => 'required|in:hours,days',
-            'pricing.*.price' => 'nullable|numeric|min:0',
-            'pricing.*.sale_price' => 'nullable|numeric|min:0',
             'max_people' => 'nullable|integer|min:1',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'booking_type' => 'required|in:internal,external',
             'booking_url' => 'nullable|required_if:booking_type,external|url|max:500',
+            'pricingType' => 'required|in:per_person,fixed',
+            'pricing.*.label' => 'required|string|max:255',
+            'pricing.*.price' => 'nullable|numeric|min:0',
+            'pricing.*.min_qty' => 'nullable|integer|min:0',
         ]);
 
-        $prices = collect($this->pricing);
+        $pricingData = [
+            'type' => $this->pricingType,
+            'categories' => collect($this->pricing)->map(function ($item) {
+                return [
+                    'category' => $item['category'] ?: \Illuminate\Support\Str::slug($item['label']),
+                    'label' => $item['label'],
+                    'price' => $item['price'] ? (float) $item['price'] : null,
+                    'sale_price' => isset($item['sale_price']) && $item['sale_price'] !== '' ? (float) $item['sale_price'] : null,
+                    'min_qty' => (int) ($item['min_qty'] ?? 0),
+                ];
+            })->values()->toArray(),
+        ];
+
+        $prices = collect($pricingData['categories']);
         $this->price = $prices->pluck('sale_price')->merge($prices->pluck('price'))->filter(fn($v) => !is_null($v) && $v > 0)->sort()->first() ?? 0;
         $this->sale_price = $prices->pluck('sale_price')->filter(fn($v) => !is_null($v) && $v > 0)->sort()->first();
 
@@ -201,7 +241,7 @@ class TourForm extends Component
             'price' => $this->price,
             'sale_price' => $this->sale_price,
             'max_people' => $this->max_people,
-            'pricing' => $this->pricing,
+            'pricing' => $pricingData,
             'images' => $this->images,
             'featured_image' => $this->featured_image,
             'highlights' => $this->highlights,

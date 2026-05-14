@@ -30,7 +30,13 @@ class TourDetail extends Component
     public function getPricingProperty()
     {
         $tour = $this->getTour();
-        return $tour->pricing ?? (new Tour)->pricingDefaults;
+        return $tour->pricing_categories;
+    }
+
+    public function getPricingTypeProperty()
+    {
+        $tour = $this->getTour();
+        return $tour->pricing_type;
     }
 
     public function incrementQuantity($category)
@@ -47,7 +53,7 @@ class TourDetail extends Component
     public function getSubtotalProperty()
     {
         $tour = $this->getTour();
-        $pricing = $tour->pricing ?? (new Tour)->pricingDefaults;
+        $pricing = $tour->pricing_categories;
         $total = 0;
 
         foreach ($pricing as $item) {
@@ -87,6 +93,16 @@ class TourDetail extends Component
             return;
         }
 
+        $pricing = $tour->pricing_categories;
+        foreach ($pricing as $item) {
+            $qty = $this->quantities[$item['category']] ?? 0;
+            $min = $item['min_qty'] ?? 0;
+            if ($qty > 0 && $qty < $min) {
+                session()->flash('error', $item['label'] . ' requires a minimum of ' . $min . ' guests.');
+                return;
+            }
+        }
+
         session()->put('booking_data', [
             'tour_id' => $tour->id,
             'travel_date' => $this->travelDate,
@@ -107,11 +123,13 @@ class TourDetail extends Component
             abort(404);
         }
 
-        $pricing = $tour->pricing ?? (new Tour)->pricingDefaults;
+        $pricing = $tour->pricing_categories;
+        $pricingType = $tour->pricing_type;
 
         return view('components.front.tour-detail', [
             'tour' => $tour,
             'pricing' => $pricing,
+            'pricingType' => $pricingType,
         ]);
     }
 }

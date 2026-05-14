@@ -46,5 +46,24 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+
+        $this->configureStorage();
+    }
+
+    protected function configureStorage(): void
+    {
+        try {
+            $disk = \App\Models\Setting::get('storage_disk', 'public');
+            if ($disk === 's3') {
+                config([
+                    'filesystems.disks.s3.key' => \App\Models\Setting::get('aws_key') ?: config('filesystems.disks.s3.key'),
+                    'filesystems.disks.s3.secret' => \App\Models\Setting::get('aws_secret') ?: config('filesystems.disks.s3.secret'),
+                    'filesystems.disks.s3.region' => \App\Models\Setting::get('aws_region') ?: config('filesystems.disks.s3.region'),
+                    'filesystems.disks.s3.bucket' => \App\Models\Setting::get('aws_bucket') ?: config('filesystems.disks.s3.bucket'),
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Table may not exist during migrations
+        }
     }
 }

@@ -3,6 +3,11 @@
 @section('title', 'Booking Confirmed')
 
 @section('content')
+    <section class="bg-gray-50 border-b border-gray-200">
+        <x-breadcrumbs :items="[
+            ['label' => 'Booking Confirmed'],
+        ]" />
+    </section>
     <section class="py-16 bg-gray-50 min-h-screen">
         <div class="max-w-2xl mx-auto px-4">
             <!-- Success Card -->

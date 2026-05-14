@@ -5,7 +5,10 @@
 @section('content')
     <!-- Page Header -->
     <section class="bg-gray-50 border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-16 text-center">
+        <x-breadcrumbs :items="[
+            ['label' => 'Contact Us'],
+        ]" />
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 text-center">
             <h1 class="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto">Have a question or need help planning your trip? We are here to help.</p>
         </div>

@@ -25,6 +25,11 @@ class SettingSeeder extends Seeder
             'social_youtube' => '#',
             'logo' => '',
             'favicon' => '',
+            'storage_disk' => 'public',
+            'aws_key' => '',
+            'aws_secret' => '',
+            'aws_region' => 'us-east-1',
+            'aws_bucket' => '',
         ];
 
         foreach ($defaults as $key => $value) {

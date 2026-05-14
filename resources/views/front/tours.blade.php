@@ -1,11 +1,9 @@
 <div>
     <section class="bg-gray-50 border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-8">
-            <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                <a href="{{ route('home') }}" wire:navigate class="hover:text-primary-600 transition-colors">Home</a>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <span class="text-gray-900 font-medium">All Tours</span>
-            </div>
+        <x-breadcrumbs :items="[
+            ['label' => 'All Tours'],
+        ]" />
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
             <h1 class="text-3xl font-bold text-gray-900">All Tours</h1>
             <p class="mt-2 text-gray-600">Explore our complete collection of Niagara Falls tours and experiences.</p>
         </div>
@@ -115,9 +113,12 @@
                                 @endif
                             </div>
                             <div class="p-5">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">
                                     <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate>{{ $tour->title }}</a>
                                 </h3>
+                                @if($tour->short_description)
+                                    <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $tour->short_description }}</p>
+                                @endif
                                 <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
                                     <span class="flex items-center gap-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>

@@ -119,6 +119,47 @@
             </div>
         </div>
 
+        {{-- Storage --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+             x-data="{ disk: $wire.$entangle('storage_disk', true) }">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Storage</h3>
+            <p class="text-sm text-gray-500 mb-4">Choose where uploaded media files are stored.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Storage Disk</label>
+                    <select x-model="disk" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="public">Local (public/storage)</option>
+                        <option value="s3">Amazon S3</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <template x-if="disk === 's3'">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div class="md:col-span-2">
+                            <p class="text-xs text-amber-700 font-medium">S3 credentials can also be set via .env file (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION, AWS_BUCKET). Values entered here will override .env values.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">AWS Access Key ID</label>
+                            <input type="text" wire:model="aws_key" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">AWS Secret Access Key</label>
+                            <input type="password" wire:model="aws_secret" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">AWS Region</label>
+                            <input type="text" wire:model="aws_region" placeholder="us-east-1" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">AWS Bucket</label>
+                            <input type="text" wire:model="aws_bucket" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
         <div class="flex items-center justify-end gap-3">
             <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700" wire:loading.attr="disabled">
                 Save All Settings

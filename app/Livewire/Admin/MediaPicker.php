@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Media;
+use App\Models\Setting;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
@@ -50,8 +51,8 @@ class MediaPicker extends Component
     {
         if (empty($this->selectedIds)) return;
 
-        $urls = Media::whereIn('id', $this->selectedIds)->pluck('path', 'id')->map(function ($path) {
-            return asset('storage/' . $path);
+        $urls = Media::whereIn('id', $this->selectedIds)->get()->map(function ($media) {
+            return $media->url;
         })->values()->toArray();
 
         $this->dispatch('mediaSelected', urls: $urls, ids: $this->selectedIds);
@@ -62,15 +63,17 @@ class MediaPicker extends Component
     {
         $this->validate();
 
+        $disk = Setting::get('storage_disk', 'public');
+
         foreach ($this->uploads as $file) {
             $fileName = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('media', $fileName, 'public');
+            $path = $file->storeAs('media', $fileName, $disk);
 
             Media::create([
                 'name' => $file->getClientOriginalName(),
                 'file_name' => $fileName,
                 'mime_type' => $file->getMimeType(),
-                'disk' => 'public',
+                'disk' => $disk,
                 'path' => $path,
                 'size' => $file->getSize(),
                 'user_id' => Auth::id(),

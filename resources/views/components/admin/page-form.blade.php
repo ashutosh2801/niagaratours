@@ -1,10 +1,11 @@
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-6">
-        <a href="{{ route('admin.pages') }}" wire:navigate class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Back to Pages
-        </a>
-    </div>
+    <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-primary-600 transition-colors">Dashboard</a>
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <a href="{{ route('admin.pages') }}" wire:navigate class="hover:text-primary-600 transition-colors">Pages</a>
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <span class="text-gray-900 font-medium">{{ $pageId ? 'Edit: ' . ($title ?? 'Page') : 'Create Page' }}</span>
+    </nav>
 
     <form wire:submit.prevent="save" class="space-y-6">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

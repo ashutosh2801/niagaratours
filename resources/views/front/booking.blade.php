@@ -5,16 +5,12 @@
 @section('content')
     <!-- Page Header -->
     <section class="bg-gray-50 border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-8">
-            <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                <a href="{{ route('home') }}" wire:navigate class="hover:text-primary-600 transition-colors">Home</a>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <a href="{{ route('tours') }}" wire:navigate class="hover:text-primary-600 transition-colors">Tours</a>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <a href="{{ route('tours.show', $tour ?? '') }}" wire:navigate class="hover:text-primary-600 transition-colors">{{ $tour->title ?? 'Tour' }}</a>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                <span class="text-gray-900 font-medium">Book Now</span>
-            </div>
+        <x-breadcrumbs :items="[
+            ['label' => 'Tours', 'url' => route('tours')],
+            ['label' => $tour->title ?? 'Tour', 'url' => route('tour.detail', $tour->slug ?? '')],
+            ['label' => 'Book Now'],
+        ]" />
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
             <h1 class="text-3xl font-bold text-gray-900">Book Your Tour</h1>
             <p class="mt-2 text-gray-600">Complete your booking details below.</p>
         </div>

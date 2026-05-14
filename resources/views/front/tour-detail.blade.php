@@ -4,16 +4,31 @@
 
 @section('content')
     <!-- Hero / Gallery -->
-    @php $allImages = array_merge(
-        $tour->featured_image ? [$tour->featured_image] : [],
-        $tour->images ?? []
-    ); @endphp
-    <section class="relative" x-data="{ selected: '{{ $allImages[0] ?? '' }}' }">
-        <div class="relative h-[400px] md:h-[500px] overflow-hidden">
-            <img :src="selected" src="{{ $allImages[0] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}" alt="{{ $tour->title }}" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-                <div class="max-w-7xl mx-auto">
+    @php
+        $allImages = array_merge(
+            $tour->featured_image ? [$tour->featured_image] : [],
+            $tour->images ?? []
+        );
+        $mainImage = $allImages[0] ?? null;
+        $thumbImages = array_slice($allImages, 1, 4);
+        $remainingCount = count($allImages) - 5;
+    @endphp
+    <section class="relative"
+             x-data="{ galleryOpen: false, currentIndex: 0, images: {{ json_encode($allImages) }} }"
+             @keydown.window.escape="galleryOpen = false"
+             @keydown.window.left="currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1"
+             @keydown.window.right="currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0">
+
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-2 h-[300px] lg:h-[400px]">
+            {{-- Main large image --}}
+            <div class="lg:col-span-3 relative overflow-hidden rounded-lg bg-gray-900 h-full">
+                @if($mainImage)
+                    <img src="{{ $mainImage }}" alt="{{ $tour->title }}" class="w-full h-full object-cover cursor-pointer" @click="galleryOpen = true; currentIndex = 0">
+                @else
+                    <img src="https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="{{ $tour->title }}" class="w-full h-full object-cover cursor-pointer" @click="galleryOpen = true; currentIndex = 0">
+                @endif
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10 pointer-events-none">
                     <div class="flex flex-wrap items-center gap-3 mb-3">
                         @if($tour->category)
                             <span class="px-3 py-1 bg-primary-600 text-white text-sm font-medium rounded-full">{{ $tour->category->name }}</span>
@@ -30,28 +45,108 @@
                     <h1 class="text-3xl md:text-4xl font-bold text-white">{{ $tour->title }}</h1>
                 </div>
             </div>
-        </div>
-        @if(count($allImages) > 1)
-            <div class="max-w-7xl mx-auto px-4 -mt-16 relative z-10">
-                <div class="flex gap-3 overflow-x-auto pb-4">
-                    @foreach($allImages as $image)
-                        <img src="{{ $image }}" alt="" @click="selected = '{{ $image }}'" :class="{ 'ring-2 ring-primary-500 ring-offset-2': selected === '{{ $image }}' }" class="w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg shadow-md border-2 border-white shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+
+            {{-- Thumbnails grid (right side) --}}
+            @if(count($thumbImages) > 0)
+                <div class="hidden lg:grid grid-cols-2 gap-2 h-full">
+                    @foreach($thumbImages as $index => $img)
+                        <div class="relative overflow-hidden rounded-lg bg-gray-900 cursor-pointer group h-full"
+                             @click="galleryOpen = true; currentIndex = {{ $index + 1 }}">
+                            <img src="{{ $img }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            @if($index === 3 && $remainingCount > 0)
+                                <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                    <span class="text-white text-lg font-bold">+{{ $remainingCount }} more</span>
+                                </div>
+                            @endif
+                        </div>
                     @endforeach
+                    @for($i = count($thumbImages); $i < 4; $i++)
+                        <div class="rounded-lg bg-gradient-to-br from-gray-700 to-gray-900 h-full"></div>
+                    @endfor
                 </div>
+            @endif
+        </div>
+
+        {{-- View all photos button --}}
+        @if(count($allImages) > 1)
+            <div class="max-w-7xl mx-auto px-4 mt-2">
+                <button @click="galleryOpen = true; currentIndex = 0"
+                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    View all photos ({{ count($allImages) }})
+                </button>
             </div>
         @endif
+
+        {{-- Mobile thumbnails row --}}
+        @if(count($thumbImages) > 0)
+            <div class="max-w-7xl mx-auto px-4 mt-2 flex gap-2 overflow-x-auto pb-1 lg:hidden">
+                @foreach($thumbImages as $index => $img)
+                    <div class="w-20 h-14 shrink-0 rounded-lg overflow-hidden cursor-pointer" @click="galleryOpen = true; currentIndex = {{ $index + 1 }}">
+                        <img src="{{ $img }}" alt="" class="w-full h-full object-cover">
+                    </div>
+                @endforeach
+                @if($remainingCount > 0)
+                    <div class="w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-black/80 flex items-center justify-center cursor-pointer" @click="galleryOpen = true; currentIndex = 4">
+                        <span class="text-white text-xs font-bold">+{{ $remainingCount }}</span>
+                    </div>
+                @endif
+            </div>
+        @endif
+
+        {{-- Gallery Modal --}}
+        <div x-show="galleryOpen"
+             x-cloak
+             class="fixed inset-0 z-50 bg-black/70 flex items-center justify-center"
+             x-transition.opacity.duration.300ms
+             @click.self="galleryOpen = false">
+
+            <button @click="galleryOpen = false" class="absolute top-4 right-4 text-white/80 hover:text-white z-10 transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <div class="absolute top-6 left-1/2 -translate-x-1/2 text-white/80 text-sm font-medium z-10" x-text="`${currentIndex + 1} / ${images.length}`"></div>
+
+            <button @click="currentIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors backdrop-blur-sm">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                <span class="text-sm font-medium hidden md:inline">Previous</span>
+            </button>
+
+            <div class="flex items-center justify-center w-full h-full p-16">
+                <img :src="images[currentIndex]" alt="" class="max-w-full max-h-full object-contain">
+            </div>
+
+            <button @click="currentIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors backdrop-blur-sm">
+                <span class="text-sm font-medium hidden md:inline">Next</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 max-w-[90vw] overflow-x-auto pb-1 z-10">
+                <template x-for="(img, index) in images" :key="index">
+                    <div @click="currentIndex = index"
+                         :class="{ 'ring-2 ring-white ring-offset-2 ring-offset-black': currentIndex === index, 'opacity-60 hover:opacity-100': currentIndex !== index }"
+                         class="w-16 h-10 shrink-0 rounded overflow-hidden cursor-pointer transition-all">
+                        <img :src="img" alt="" class="w-full h-full object-cover">
+                    </div>
+                </template>
+            </div>
+        </div>
     </section>
 
-    <!-- Breadcrumb -->
-    <div class="max-w-7xl mx-auto px-4 py-4">
-        <div class="flex items-center gap-2 text-sm text-gray-500">
-            <a href="{{ route('home') }}" wire:navigate class="hover:text-primary-600 transition-colors">Home</a>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            <a href="{{ route('tours') }}" wire:navigate class="hover:text-primary-600 transition-colors">Tours</a>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            <span class="text-gray-900 font-medium">{{ $tour->title }}</span>
-        </div>
-    </div>
+    <x-breadcrumbs :items="[
+        ['label' => 'Tours', 'url' => route('tours')],
+        ['label' => $tour->title],
+    ]" />
 
     <!-- Main Content -->
     <section class="py-8 bg-gray-50">

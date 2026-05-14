@@ -8,6 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -31,17 +32,18 @@ class MediaLibrary extends Component
     {
         $this->validate();
 
+        $disk = Setting::get('storage_disk', 'public');
         $count = count($this->uploads);
 
         foreach ($this->uploads as $file) {
             $fileName = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('media', $fileName, 'public');
+            $path = $file->storeAs('media', $fileName, $disk);
 
             Media::create([
                 'name' => $file->getClientOriginalName(),
                 'file_name' => $fileName,
                 'mime_type' => $file->getMimeType(),
-                'disk' => 'public',
+                'disk' => $disk,
                 'path' => $path,
                 'size' => $file->getSize(),
                 'user_id' => Auth::id(),
@@ -52,10 +54,15 @@ class MediaLibrary extends Component
         session()->flash('message', $count . ' file(s) uploaded successfully.');
     }
 
+    public function getDisk(): string
+    {
+        return Setting::get('storage_disk', 'public');
+    }
+
     public function delete($id)
     {
         $media = Media::findOrFail($id);
-        Storage::disk($media->disk)->delete($media->path);
+        Storage::disk($media->disk ?? Setting::get('storage_disk', 'public'))->delete($media->path);
         $media->delete();
         session()->flash('message', 'File deleted successfully.');
     }
