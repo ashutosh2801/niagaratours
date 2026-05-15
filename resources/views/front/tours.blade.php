@@ -112,58 +112,58 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                     @forelse($tours ?? [] as $tour)
-                        <div class="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                            <div class="relative h-48 overflow-hidden">
-                                <img src="{{ $tour->featured_image ?? $tour->images[0] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" alt="{{ $tour->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                @if($tour->category)
-                                    <span class="absolute top-3 left-3 px-3 py-1 bg-primary-600 text-white text-xs font-medium rounded-full">{{ $tour->category->name }}</span>
+                        @php $startingPrice = $tour->starting_price ?: $tour->price; @endphp
+                        <div class="group bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300">
+                            <div class="relative h-52 overflow-hidden">
+                                <img src="{{ $tour->featured_image ?? $tour->images[0] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" alt="{{ $tour->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                                @if($loop->first)
+                                    <span class="absolute top-3 left-3 px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full">Likely to Sell Out</span>
                                 @endif
+                                <span class="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold rounded-full">{{ $tour->duration_type ?? 'full-day' }}</span>
                                 @if($tour->sale_price)
-                                    <span class="absolute top-3 right-3 px-3 py-1 bg-red-500 text-white text-xs font-medium rounded-full">Sale</span>
+                                    <span class="absolute bottom-3 left-3 px-3 py-1.5 bg-red-500 text-white text-sm font-bold rounded-lg">From ${{ number_format($startingPrice, 2) }}</span>
+                                @elseif($startingPrice)
+                                    <span class="absolute bottom-3 left-3 px-3 py-1.5 bg-primary-600 text-white text-sm font-bold rounded-lg">From ${{ number_format($startingPrice, 2) }}</span>
                                 @endif
                             </div>
-                            <div class="p-5">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">
+                            <div class="p-6">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
                                     <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate>{{ $tour->title }}</a>
                                 </h3>
                                 @if($tour->short_description)
-                                    <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $tour->short_description }}</p>
+                                    <p class="text-sm text-gray-500 mb-4 line-clamp-2 leading-relaxed">{{ $tour->short_description }}</p>
                                 @endif
-                                <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                                    <span class="flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                        {{ $tour->location ?? 'Niagara Falls' }}
+                                <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        {{ $tour->duration ?? '6 Hours' }}
                                     </span>
-                                    <span class="flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        {{ $tour->duration ?? '2 hours' }}
+                                    @if($tour->max_people)
+                                    <span class="flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        1-{{ $tour->max_people }}
                                     </span>
+                                    @endif
                                 </div>
-                                <div class="flex items-center gap-1 mb-4">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= round($tour->rating ?? 5))
-                                            <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                        @else
-                                            <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                        @endif
-                                    @endfor
-                                    <span class="text-sm text-gray-500 ml-1">({{ $tour->review_count ?? 0 }})</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        @if($tour->sale_price)
-                                            <span class="text-lg font-bold text-gray-900">From ${{ number_format($tour->sale_price, 2) }}</span>
-                                            <span class="text-sm text-gray-400 line-through ml-2">${{ number_format($tour->price, 2) }}</span>
-                                        @elseif($tour->price)
-                                            <span class="text-lg font-bold text-gray-900">From ${{ number_format($tour->price, 2) }}</span>
-                                        @endif
+                                <div class="flex items-center gap-1.5 mb-4">
+                                    <div class="flex items-center">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= round($tour->rating ?? 5))
+                                                <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            @else
+                                                <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            @endif
+                                        @endfor
                                     </div>
-                                    <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate class="inline-flex items-center gap-1 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
-                                        Book Now
-                                    </a>
+                                    <span class="text-sm font-bold text-gray-900">{{ number_format($tour->rating ?? 5, 1) }}</span>
+                                    <span class="text-sm text-gray-400">({{ $tour->review_count }})</span>
                                 </div>
+                                <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate class="block w-full text-center px-4 py-2.5 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-500 transition-colors">
+                                    Book Now
+                                </a>
                             </div>
                         </div>
                     @empty

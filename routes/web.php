@@ -54,6 +54,9 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/media', App\Livewire\Admin\MediaLibrary::class)->name('media');
     Route::get('/sections', App\Livewire\Admin\SectionList::class)->name('sections');
     Route::get('/menus', App\Livewire\Admin\MenuList::class)->name('menus');
+    Route::get('/reviews', App\Livewire\Admin\ReviewList::class)->name('reviews');
+    Route::get('/posts', App\Livewire\Admin\PostList::class)->name('posts');
+    Route::get('/newsletter', App\Livewire\Admin\NewsletterList::class)->name('newsletter');
     Route::get('/settings', App\Livewire\Admin\SiteSettings::class)->name('settings');
 });
 

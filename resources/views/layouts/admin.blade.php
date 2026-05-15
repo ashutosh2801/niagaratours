@@ -13,7 +13,7 @@
 </head>
 <body class="h-full">
     @php
-        $isContent = request()->routeIs('admin.tours*') || request()->routeIs('admin.orders*') || request()->routeIs('admin.payments*') || request()->routeIs('admin.pages*') || request()->routeIs('admin.notifications*');
+        $isContent = request()->routeIs('admin.tours*') || request()->routeIs('admin.orders*') || request()->routeIs('admin.payments*') || request()->routeIs('admin.pages*') || request()->routeIs('admin.notifications*') || request()->routeIs('admin.reviews*') || request()->routeIs('admin.posts*') || request()->routeIs('admin.newsletter*');
         $isAppearance = request()->routeIs('admin.media*') || request()->routeIs('admin.sections*') || request()->routeIs('admin.menus*');
         $isSystem = request()->routeIs('admin.users*') || request()->routeIs('admin.settings*');
     @endphp
@@ -81,6 +81,28 @@
                         <a href="{{ route('admin.notifications') }}" wire:navigate class="flex items-center gap-3 px-3 py-2 pl-8 text-sm font-medium rounded-lg {{ request()->routeIs('admin.notifications*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
                             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                             Notifications
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Content Group --}}
+                <div x-data="{ open: openGroups.content }">
+                    <button @click="open = !open; openGroups.content = open" class="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-200 rounded-lg hover:bg-gray-800">
+                        <span>Content</span>
+                        <svg class="w-3.5 h-3.5 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="open" x-collapse class="space-y-0.5 mt-0.5">
+                        <a href="{{ route('admin.reviews') }}" wire:navigate class="flex items-center gap-3 px-3 py-2 pl-8 text-sm font-medium rounded-lg {{ request()->routeIs('admin.reviews*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                            Reviews
+                        </a>
+                        <a href="{{ route('admin.posts') }}" wire:navigate class="flex items-center gap-3 px-3 py-2 pl-8 text-sm font-medium rounded-lg {{ request()->routeIs('admin.posts*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                            Blog Posts
+                        </a>
+                        <a href="{{ route('admin.newsletter') }}" wire:navigate class="flex items-center gap-3 px-3 py-2 pl-8 text-sm font-medium rounded-lg {{ request()->routeIs('admin.newsletter*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            Newsletter
                         </a>
                     </div>
                 </div>
