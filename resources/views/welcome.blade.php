@@ -14,7 +14,10 @@
     $popularTours = Tour::where('is_active', true)->where('is_featured', true)->orderBy('id', 'desc')->take(6)->get();
     $featuredReviews = Review::active()->take(3)->get();
     $latestPosts = Post::active()->published()->orderBy('published_at', 'desc')->take(3)->get();
-    $faqs = Tour::where('is_active', true)->whereNotNull('faqs')->where('faqs', '!=', '[]')->inRandomOrder()->take(5)->get()->flatMap(fn($t) => collect($t->faqs)->take(2))->take(6);
+    $faqSection = $enabledSections->firstWhere('key', 'faq');
+    $reviewsSection = $enabledSections->firstWhere('key', 'reviews');
+    $promoSection = $enabledSections->firstWhere('key', 'featured_promo');
+    $blogSection = $enabledSections->firstWhere('key', 'blog');
 @endphp
 
 @section('hero')
@@ -29,7 +32,6 @@
         $popularSettings = optional($enabledSections->firstWhere('key', 'popular_tours'))->settings;
         $ptIds = $popularSettings['tour_ids'] ?? [];
         $ptTours = $ptIds ? Tour::whereIn('id', $ptIds)->where('is_active', true)->get() : $popularTours;
-        $whySettings = optional($enabledSections->firstWhere('key', 'why_choose_us'))->settings;
     @endphp
 
     {{-- ==================== TOUR CARDS GRID (Popular Tours) ==================== --}}
@@ -119,22 +121,24 @@
     @endif
 
     {{-- ==================== FAQ SECTION ==================== --}}
+    @if($faqSection)
+    @php $faqSettings = $faqSection->settings; $faqs = $faqSettings['faqs'] ?? []; @endphp
     <section class="py-16 md:py-24 bg-gray-50">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12 md:mb-16">
-                <p class="inline-block px-5 py-2 bg-primary-600 text-white text-sm font-bold rounded-full mb-5">All Tasting Fees Are Included!</p>
-                <h2 class="text-3xl md:text-5xl font-bold text-gray-900">FREQUENTLY ASKED QUESTIONS?</h2>
+                <p class="inline-block px-5 py-2 bg-primary-600 text-white text-sm font-bold rounded-full mb-5">{{ $faqSettings['badge_text'] ?? 'All Tasting Fees Are Included!' }}</p>
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900">{{ $faqSettings['title'] ?? 'FREQUENTLY ASKED QUESTIONS?' }}</h2>
             </div>
 
-            @if($faqs->isNotEmpty())
+            @if(!empty($faqs))
                 <div x-data="{ openFaq: null }" class="space-y-4">
-                    @foreach($faqs as $faq)
+                    @foreach($faqs as $i => $faq)
                         <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                            <button @click="openFaq = openFaq === {{ $loop->index }} ? null : {{ $loop->index }}" class="w-full flex items-center justify-between px-6 md:px-8 py-5 text-left">
+                            <button @click="openFaq = openFaq === {{ $i }} ? null : {{ $i }}" class="w-full flex items-center justify-between px-6 md:px-8 py-5 text-left">
                                 <span class="font-semibold text-gray-900 pr-4 text-sm md:text-base">{{ $faq['question'] ?? '' }}</span>
-                                <svg class="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200" :class="openFaq === {{ $loop->index }} ? 'rotate-45' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                <svg class="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200" :class="openFaq === {{ $i }} ? 'rotate-45' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             </button>
-                            <div x-show="openFaq === {{ $loop->index }}" x-cloak class="px-6 md:px-8 pb-6">
+                            <div x-show="openFaq === {{ $i }}" x-cloak class="px-6 md:px-8 pb-6">
                                 <p class="text-gray-600 leading-relaxed text-sm">{{ $faq['answer'] ?? '' }}</p>
                             </div>
                         </div>
@@ -143,11 +147,11 @@
             @else
                 <div x-data="{ openFaq: null }" class="space-y-4">
                     @foreach([
-                        ['q' => 'Is transportation included for all tours?', 'a' => 'Yes, all tours include complimentary pick-up and drop-off from your accommodation within the Niagara region. If guests are wondering if their location is included within our pick-up zone, we encourage them to reach out to our team for confirmation.'],
-                        ['q' => 'Can we request specific attractions on our tour?', 'a' => 'Yes, we always attempt to ensure your preferences are met. Guests can communicate their wish list when making a reservation, or can connect with our team to let us know your priorities. We will always do our best to accommodate.'],
+                        ['q' => 'Is transportation included for all tours?', 'a' => 'Yes, all tours include complimentary pick-up and drop-off from your accommodation within the Niagara region.'],
+                        ['q' => 'Can we request specific attractions on our tour?', 'a' => 'Yes, we always attempt to ensure your preferences are met. Guests can communicate their wish list when making a reservation.'],
                         ['q' => 'Which tour is best for scenic views?', 'a' => 'Our Niagara Grand Tour is widely recognized as the most scenic experience. Located minutes from the falls, this tour offers incredible views of the surrounding gorge and vineyards.'],
-                        ['q' => 'Do tours run year-round?', 'a' => 'Yes, we operate year-round. Spring and fall offer incredible views with fewer crowds. Summer is perfect for boat cruises. Fall tours offer an opportunity to witness the harvest season.'],
-                        ['q' => 'What is the difference between a public and private tour?', 'a' => 'Both options include pickup, drop-off, a guide and all fees. Public tour groups are between 8-14 people. Private tours are exclusive to your group, offering a more curated and flexible experience.'],
+                        ['q' => 'Do tours run year-round?', 'a' => 'Yes, we operate year-round. Spring and fall offer incredible views with fewer crowds. Summer is perfect for boat cruises.'],
+                        ['q' => 'What is the difference between a public and private tour?', 'a' => 'Both options include pickup, drop-off, a guide and all fees. Public tour groups are between 8-14 people. Private tours are exclusive to your group.'],
                         ['q' => 'Are tasting fees included in wine tours?', 'a' => 'Yes, all tasting fees are included in the price of our wine tours. Everything is included so you can focus on enjoying your experience.'],
                     ] as $i => $item)
                         <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -171,8 +175,12 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- ==================== WHY CHOOSE US ==================== --}}
+    @php $whySection = $enabledSections->firstWhere('key', 'why_choose_us'); @endphp
+    @if($whySection)
+    @php $whySettings = $whySection->settings; @endphp
     <section class="py-16 md:py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12 md:mb-16">
@@ -190,10 +198,11 @@
                     ['title' => 'All-Inclusive', 'description' => 'All of our tours include tasting fees, and complimentary pick-up and drop off. When everything is included with your tour you can let us worry about the details and focus on enjoying your experience.'],
                     ['title' => 'Amazing Guides', 'description' => 'Our guiding team offers a youthful, energetic and fun approach to all our tours. All our guides are highly skilled and trained to ensure you have the best tour experience of your life!'],
                     ['title' => 'Flexible Booking', 'description' => 'Need to re-schedule or cancel your booking? We got you! Book with us and avoid the stress of rigid bookings. All reservations include a flexible cancellation, transfer and refund policy.'],
+                    ['title' => 'Best Value', 'description' => 'We offer competitive pricing without compromising on quality. Our tours provide exceptional value with premium experiences, making your Niagara adventure both memorable and affordable.'],
                 ];
             @endphp
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
                 @foreach($features as $i => $feature)
                     <div class="text-center">
                         <div class="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 {{ $i === 1 ? 'bg-primary-100' : 'bg-gray-100' }}">
@@ -202,8 +211,10 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                                 @elseif($i === 1)
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                @else
+                                @elseif($i === 2)
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                @else
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 @endif
                             </svg>
                         </div>
@@ -220,14 +231,21 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- ==================== REVIEWS SECTION ==================== --}}
+    @if($reviewsSection)
+    @php $reviewSettings = $reviewsSection->settings; @endphp
     <section class="py-16 md:py-24 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12 md:mb-16">
-                <p class="text-sm font-semibold text-primary-600 uppercase tracking-widest mb-3">WHAT PEOPLE ARE SAYING</p>
-                <h2 class="text-3xl md:text-5xl font-bold text-gray-900">5 Star Niagara Tours</h2>
-                <p class="mt-4 text-lg text-gray-600">Based on Over {{ \App\Models\Review::count() > 0 ? \App\Models\Review::count() . ' Reviews' : '2,000+ Reviews' }}</p>
+                <p class="text-sm font-semibold text-primary-600 uppercase tracking-widest mb-3">{{ $reviewSettings['badge'] ?? 'WHAT PEOPLE ARE SAYING' }}</p>
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900">{{ $reviewSettings['title'] ?? '5 Star Niagara Tours' }}</h2>
+                @if(!empty($reviewSettings['subtitle']))
+                    <p class="mt-4 text-lg text-gray-600">{{ $reviewSettings['subtitle'] }}</p>
+                @else
+                    <p class="mt-4 text-lg text-gray-600">Based on Over {{ \App\Models\Review::count() > 0 ? \App\Models\Review::count() . ' Reviews' : '2,000+ Reviews' }}</p>
+                @endif
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -275,9 +293,11 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- ==================== NOW FEATURING (Promo) ==================== --}}
-    @php $promoSettings = optional($enabledSections->firstWhere('key', 'featured_promo'))->settings; @endphp
+    @if($promoSection)
+    @php $promoSettings = $promoSection->settings; @endphp
     <section class="relative py-24 md:py-32 bg-cover bg-center" style="background-image: url('{{ $promoSettings['background_image'] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}');">
         <div class="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/75 to-gray-900/60"></div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -298,17 +318,19 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- ==================== LATEST NEWS / BLOG ==================== --}}
-    @if($latestPosts->isNotEmpty())
+    @if($blogSection && $latestPosts->isNotEmpty())
+    @php $blogSettings = $blogSection->settings; @endphp
     <section class="py-16 md:py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between mb-12 md:mb-16">
                 <div>
-                    <p class="text-sm font-semibold text-primary-600 uppercase tracking-widest mb-3">LATEST NEWS & TRENDS</p>
-                    <h2 class="text-3xl md:text-5xl font-bold text-gray-900">From Our Blog</h2>
+                    <p class="text-sm font-semibold text-primary-600 uppercase tracking-widest mb-3">{{ $blogSettings['badge'] ?? 'LATEST NEWS & TRENDS' }}</p>
+                    <h2 class="text-3xl md:text-5xl font-bold text-gray-900">{{ $blogSettings['title'] ?? 'From Our Blog' }}</h2>
                 </div>
-                <a href="#" class="hidden sm:inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-500 transition-colors text-sm">
+                <a href="{{ $blogSettings['view_all_link'] ?? '#' }}" class="hidden sm:inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-500 transition-colors text-sm">
                     View All
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
@@ -336,7 +358,7 @@
             </div>
 
             <div class="text-center mt-10 sm:hidden">
-                <a href="#" class="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-500 transition-colors text-sm">
+                <a href="{{ $blogSettings['view_all_link'] ?? '#' }}" class="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-500 transition-colors text-sm">
                     View All
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>

@@ -34,7 +34,7 @@
         $socialYoutube = $settings['social_youtube'] ?? '#';
     @endphp
 
-    <div x-data="{ mobileMenuOpen: false, activeDropdown: null }" class="flex flex-col min-h-screen">
+    <div class="flex flex-col min-h-screen">
         <!-- Discount Banner -->
         <div class="bg-primary-700 text-white text-xs sm:text-sm py-2.5 text-center">
             <div class="max-w-7xl mx-auto px-4">
@@ -47,10 +47,54 @@
             <div class="max-w-7xl mx-auto px-4">
                 <div class="flex items-center justify-between h-16">
                     <!-- Menu Button -->
-                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 -ml-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                        <span class="hidden sm:inline text-sm font-medium">Menu</span>
-                    </button>
+                    <div class="flex items-center">
+                        <button id="menuToggleBtn" class="p-2 -ml-2 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                            <span class="hidden sm:inline text-sm font-medium">Menu</span>
+                        </button>
+
+                        <!-- Slide-out Mobile Menu Overlay -->
+                        <div id="mobileMenuOverlay" class="fixed inset-0 z-50 hidden">
+                            <div id="menuBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+                            <div id="menuPanel" class="absolute inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto -translate-x-full transition-transform duration-300">
+                                <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+                                    <span class="text-lg font-bold text-gray-900">Menu</span>
+                                    <button id="menuCloseBtn" class="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                                <div class="px-5 py-4 space-y-1">
+                                    @foreach($menus as $menu)
+                                        @if($menu->children->isNotEmpty())
+                                            <div>
+                                                <button class="submenu-toggle flex items-center justify-between w-full px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                                                    {{ $menu->label }}
+                                                    <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                                </button>
+                                                <div class="submenu-content ml-4 mt-1 space-y-1 hidden">
+                                                    @foreach($menu->children as $child)
+                                                        <a href="{{ $child->url }}" wire:navigate class="block px-3 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">{{ $child->label }}</a>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @else
+                                            <a href="{{ $menu->url }}" wire:navigate class="block px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->fullUrlIs($menu->url) ? 'text-primary-600 bg-primary-50' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50' }} transition-colors">{{ $menu->label }}</a>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                <div class="px-5 py-4 border-t border-gray-200 mt-4">
+                                    <a href="tel:{{ $phone }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                        {{ $phone }}
+                                    </a>
+                                    <a href="{{ route('tours') }}" wire:navigate class="flex items-center justify-center gap-2 mt-2 w-full px-4 py-3 bg-primary-600 text-white text-sm font-bold rounded-lg hover:bg-primary-500 transition-colors shadow-lg shadow-primary-600/20">
+                                        Book Tour
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Logo (centered) -->
                     <a href="{{ route('home') }}" wire:navigate class="flex items-center gap-2 shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2">
@@ -86,48 +130,6 @@
                 </div>
             </div>
         </header>
-
-        <!-- Slide-out Mobile Menu Overlay -->
-        <div x-show="mobileMenuOpen" x-cloak class="fixed inset-0 z-50 lg:hidden">
-            <div x-show="mobileMenuOpen" x-cloak x-transition:enter="transition-opacity duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="mobileMenuOpen = false"></div>
-            <div x-show="mobileMenuOpen" x-cloak x-transition:enter="transition-transform duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition-transform duration-200" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="absolute inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto">
-                <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-                    <span class="text-lg font-bold text-gray-900">Menu</span>
-                    <button @click="mobileMenuOpen = false" class="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <div class="px-5 py-4 space-y-1">
-                    @foreach($menus as $menu)
-                        @if($menu->children->isNotEmpty())
-                            <div x-data="{ open: false }">
-                                <button @click="open = !open" class="flex items-center justify-between w-full px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
-                                    {{ $menu->label }}
-                                    <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                </button>
-                                <div x-show="open" x-cloak class="ml-4 mt-1 space-y-1">
-                                    @foreach($menu->children as $child)
-                                        <a href="{{ $child->url }}" wire:navigate @click="mobileMenuOpen = false" class="block px-3 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">{{ $child->label }}</a>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @else
-                            <a href="{{ $menu->url }}" wire:navigate @click="mobileMenuOpen = false" class="block px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->fullUrlIs($menu->url) ? 'text-primary-600 bg-primary-50' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50' }} transition-colors">{{ $menu->label }}</a>
-                        @endif
-                    @endforeach
-                </div>
-                <div class="px-5 py-4 border-t border-gray-200 mt-4">
-                    <a href="tel:{{ $phone }}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition-colors">
-                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                        {{ $phone }}
-                    </a>
-                    <a href="{{ route('tours') }}" wire:navigate @click="mobileMenuOpen = false" class="flex items-center justify-center gap-2 mt-2 w-full px-4 py-3 bg-primary-600 text-white text-sm font-bold rounded-lg hover:bg-primary-500 transition-colors shadow-lg shadow-primary-600/20">
-                        Book Tour
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                    </a>
-                </div>
-            </div>
-        </div>
 
         @hasSection('hero')
             @yield('hero')
@@ -248,6 +250,49 @@
         </footer>
     </div>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const overlay = document.getElementById('mobileMenuOverlay');
+        const toggleBtn = document.getElementById('menuToggleBtn');
+        const closeBtn = document.getElementById('menuCloseBtn');
+        const backdrop = document.getElementById('menuBackdrop');
+        const panel = document.getElementById('menuPanel');
+
+        function openMenu() {
+            overlay.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100');
+                panel.classList.remove('-translate-x-full');
+                panel.classList.add('translate-x-0');
+            });
+        }
+
+        function closeMenu() {
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            panel.classList.remove('translate-x-0');
+            panel.classList.add('-translate-x-full');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+        toggleBtn.addEventListener('click', openMenu);
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+        if (backdrop) backdrop.addEventListener('click', closeMenu);
+
+        // Submenu toggles
+        document.querySelectorAll('.submenu-toggle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('svg');
+                content.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            });
+        });
+    });
+    </script>
     @livewireScripts
     @stack('scripts')
 </body>
