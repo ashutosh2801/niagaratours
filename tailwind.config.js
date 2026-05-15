@@ -8,9 +8,9 @@ export default {
     theme: {
         extend: {
             fontSize: {
-                'xs': '1.5rem',
-                'sm': '1.75rem',
-                'base': '2rem',
+                'xs': '0.75rem',
+                'sm': '0.875rem',
+                'base': '1rem',
             },
             fontFamily: {
                 sans: ['Poppins', 'sans-serif'],
