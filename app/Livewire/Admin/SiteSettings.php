@@ -33,6 +33,7 @@ class SiteSettings extends Component
     public $aws_bucket;
     public $stripe_key;
     public $stripe_secret;
+    public $successMessage = '';
 
     protected $listeners = ['mediaSelected' => 'setMedia'];
 
@@ -107,7 +108,7 @@ class SiteSettings extends Component
             Setting::set($key, $value);
         }
 
-        session()->flash('message', 'Settings saved successfully.');
+        $this->successMessage = 'Settings saved successfully.';
     }
 
     public function render()
