@@ -20,7 +20,7 @@
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-gray-300 hover:text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
                             <div>
-                                <h3 class="font-semibold text-gray-900">{{ $section->title }}</h3>
+                                <h3 class="text-sm font-semibold text-gray-900">{{ $section->title }}</h3>
                                 <p class="text-xs text-gray-500 font-mono">{{ $section->key }}</p>
                             </div>
                         </div>
@@ -239,6 +239,106 @@
                                     @if(empty($tours))
                                         <p class="text-sm text-gray-400 italic">No active tours available.</p>
                                     @endif
+                                </div>
+
+                            @elseif($section->key === 'faq')
+                                <div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Badge Text</label>
+                                            <input type="text" wire:model="faqBadgeText" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                            <input type="text" wire:model="faqTitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">FAQ Items</h4>
+                                        <button type="button" wire:click="addFaqItem" class="text-xs font-medium text-primary-600 hover:text-primary-700">+ Add FAQ</button>
+                                    </div>
+                                    <div class="space-y-3">
+                                        @foreach($faqItems ?? [] as $i => $faq)
+                                            <div wire:key="faq-{{ $i }}" class="border border-gray-200 rounded-lg p-4">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-xs font-medium text-gray-600">FAQ {{ $i + 1 }}</span>
+                                                    @if(count($faqItems) > 1)
+                                                        <button type="button" wire:click="removeFaqItem({{ $i }})" class="text-xs text-red-600">Remove</button>
+                                                    @endif
+                                                </div>
+                                                <div class="space-y-2">
+                                                    <input type="text" wire:model="faqItems.{{ $i }}.question" placeholder="Question" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                    <textarea wire:model="faqItems.{{ $i }}.answer" rows="2" placeholder="Answer" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                            @elseif($section->key === 'reviews')
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Badge Text</label>
+                                        <input type="text" wire:model="reviewBadge" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                        <input type="text" wire:model="reviewTitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+                                        <input type="text" wire:model="reviewSubtitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                </div>
+
+                            @elseif($section->key === 'featured_promo')
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Badge Text</label>
+                                        <input type="text" wire:model="promoBadge" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                        <input type="text" wire:model="promoTitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <textarea wire:model="promoDescription" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Button Text</label>
+                                        <input type="text" wire:model="promoButtonText" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Button Link</label>
+                                        <input type="text" wire:model="promoButtonLink" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <label class="block text-sm font-medium text-gray-700">Background Image</label>
+                                            <button type="button" x-data @click="$wire.openMediaPickerForPromo().then(() => $dispatch('openMediaPicker'))" class="text-xs text-primary-600 hover:text-primary-700">Choose from Media</button>
+                                        </div>
+                                        @if($promoBgImage)
+                                            <img src="{{ $promoBgImage }}" class="h-24 w-full object-cover rounded-lg border border-gray-200 mb-2">
+                                        @endif
+                                        <input type="url" wire:model="promoBgImage" placeholder="Background image URL" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                </div>
+
+                            @elseif($section->key === 'blog')
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Badge Text</label>
+                                        <input type="text" wire:model="blogBadge" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                        <input type="text" wire:model="blogTitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">View All Link</label>
+                                        <input type="text" wire:model="blogViewAllLink" placeholder="#" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
                                 </div>
                             @endif
 

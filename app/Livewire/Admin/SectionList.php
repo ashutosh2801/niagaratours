@@ -37,6 +37,29 @@ class SectionList extends Component
     public $browseTitle;
     public $browseSubtitle;
 
+    // FAQ
+    public $faqBadgeText;
+    public $faqTitle;
+    public $faqItems = [];
+
+    // Reviews
+    public $reviewBadge;
+    public $reviewTitle;
+    public $reviewSubtitle;
+
+    // Featured Promo
+    public $promoBadge;
+    public $promoTitle;
+    public $promoDescription;
+    public $promoButtonText;
+    public $promoButtonLink;
+    public $promoBgImage;
+
+    // Blog
+    public $blogBadge;
+    public $blogTitle;
+    public $blogViewAllLink;
+
     public function mount()
     {
         $this->loadSections();
@@ -84,6 +107,35 @@ class SectionList extends Component
             $this->popToursSubtitle = $pt->settings['subtitle'] ?? '';
             $this->selectedPopularTours = $pt->settings['tour_ids'] ?? [];
         }
+
+        if ($faq = $sections->get('faq')) {
+            $this->faqBadgeText = $faq->settings['badge_text'] ?? 'All Tasting Fees Are Included!';
+            $this->faqTitle = $faq->settings['title'] ?? 'FREQUENTLY ASKED QUESTIONS?';
+            $this->faqItems = $faq->settings['faqs'] ?? [
+                ['question' => '', 'answer' => ''],
+            ];
+        }
+
+        if ($review = $sections->get('reviews')) {
+            $this->reviewBadge = $review->settings['badge'] ?? 'WHAT PEOPLE ARE SAYING';
+            $this->reviewTitle = $review->settings['title'] ?? '5 Star Niagara Tours';
+            $this->reviewSubtitle = $review->settings['subtitle'] ?? '';
+        }
+
+        if ($promo = $sections->get('featured_promo')) {
+            $this->promoBadge = $promo->settings['badge'] ?? 'Now Featuring';
+            $this->promoTitle = $promo->settings['title'] ?? 'Elevate Your Senses';
+            $this->promoDescription = $promo->settings['description'] ?? '';
+            $this->promoButtonText = $promo->settings['button_text'] ?? 'Learn More';
+            $this->promoButtonLink = $promo->settings['button_link'] ?? '/tours';
+            $this->promoBgImage = $promo->settings['background_image'] ?? '';
+        }
+
+        if ($blog = $sections->get('blog')) {
+            $this->blogBadge = $blog->settings['badge'] ?? 'LATEST NEWS & TRENDS';
+            $this->blogTitle = $blog->settings['title'] ?? 'From Our Blog';
+            $this->blogViewAllLink = $blog->settings['view_all_link'] ?? '#';
+        }
     }
 
     public function toggle($id)
@@ -117,6 +169,11 @@ class SectionList extends Component
         session()->put('mediaPicker_target', 'cta_bg');
     }
 
+    public function openMediaPickerForPromo()
+    {
+        session()->put('mediaPicker_target', 'promo_bg');
+    }
+
     public function setHeroImage($urls)
     {
         $url = is_array($urls) ? ($urls[0] ?? null) : $urls;
@@ -126,6 +183,8 @@ class SectionList extends Component
 
         if ($target === 'cta_bg') {
             $this->ctaBgImage = $url;
+        } elseif ($target === 'promo_bg') {
+            $this->promoBgImage = $url;
         } else {
             $index = session()->get('hero_slide_index');
             if ($index !== null && isset($this->heroSlides[$index])) {
@@ -154,6 +213,16 @@ class SectionList extends Component
     public function removeWhyFeature($index)
     {
         array_splice($this->whyFeatures, $index, 1);
+    }
+
+    public function addFaqItem()
+    {
+        $this->faqItems[] = ['question' => '', 'answer' => ''];
+    }
+
+    public function removeFaqItem($index)
+    {
+        array_splice($this->faqItems, $index, 1);
     }
 
     public function save()
@@ -187,6 +256,29 @@ class SectionList extends Component
             'browse_categories' => [
                 'title' => $this->browseTitle,
                 'subtitle' => $this->browseSubtitle,
+            ],
+            'faq' => [
+                'badge_text' => $this->faqBadgeText,
+                'title' => $this->faqTitle,
+                'faqs' => $this->faqItems,
+            ],
+            'reviews' => [
+                'badge' => $this->reviewBadge,
+                'title' => $this->reviewTitle,
+                'subtitle' => $this->reviewSubtitle,
+            ],
+            'featured_promo' => [
+                'badge' => $this->promoBadge,
+                'title' => $this->promoTitle,
+                'description' => $this->promoDescription,
+                'button_text' => $this->promoButtonText,
+                'button_link' => $this->promoButtonLink,
+                'background_image' => $this->promoBgImage,
+            ],
+            'blog' => [
+                'badge' => $this->blogBadge,
+                'title' => $this->blogTitle,
+                'view_all_link' => $this->blogViewAllLink,
             ],
             default => [],
         };
