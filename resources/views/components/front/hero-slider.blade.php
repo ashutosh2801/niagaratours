@@ -21,7 +21,7 @@
                 <div class="relative h-full flex items-center" style="min-height: 70vh;">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                         <div class="max-w-2xl">
-                            <h2 class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">{{ $slide['title'] ?? '' }}</h2>
+                            <h2 class="text-3xl md:text-5xl lg:text-5xl font-bold text-white leading-tight uppercase">{{ $slide['title'] ?? '' }}</h2>
                             @if(!empty($slide['description']))
                                 <p class="mt-4 text-lg md:text-xl text-gray-200 leading-relaxed">{{ $slide['description'] }}</p>
                             @endif

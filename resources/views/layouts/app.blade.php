@@ -17,8 +17,9 @@
     @if($favicon)<link rel="icon" href="{{ $favicon }}" type="image/x-icon">@endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
+
 </head>
-<body class="font-sans antialiased text-gray-800 bg-white">
+<body class="antialiased text-gray-800 bg-white">
     @php
         $settings = App\Models\Setting::all()->pluck('value', 'key')->toArray();
         $phone = $settings['contact_phone'] ?? '+1-877-888-2339';
@@ -36,10 +37,10 @@
 
     <div x-data="{ mobileMenuOpen: false, activeDropdown: null }" class="flex flex-col min-h-screen">
         <!-- Top Bar -->
-        <div class="bg-primary-900 text-white text-sm py-2">
+        <div class="top-bar bg-primary-600 text-white text-sm py-2 font-sans">
             <div class="max-w-7xl mx-auto px-4 flex items-center justify-between">
                 <span>{{ $tagline }}</span>
-                <span class="hidden sm:block">{{ $phone }}</span>
+                <a href="" class="phone-num"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="w-5 h-5"><path d="M224.2 89C216.3 70.1 195.7 60.1 176.1 65.4L170.6 66.9C106 84.5 50.8 147.1 66.9 223.3C104 398.3 241.7 536 416.7 573.1C493 589.3 555.5 534 573.1 469.4L574.6 463.9C580 444.2 569.9 423.6 551.1 415.8L453.8 375.3C437.3 368.4 418.2 373.2 406.8 387.1L368.2 434.3C297.9 399.4 241.3 341 208.8 269.3L253 233.3C266.9 222 271.6 202.9 264.8 186.3L224.2 89z" fill="#FFF" /></svg> {{ $phone }}</a>
             </div>
         </div>
 
@@ -64,18 +65,18 @@
                         @foreach($menus as $menu)
                             @if($menu->children->isNotEmpty())
                                 <div x-data="{ open: false }" class="relative">
-                                    <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-lg {{ request()->fullUrlIs($menu->url) ? 'text-primary-600 bg-primary-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' }}">
+                                    <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-1 px-4 py-2 text-sm font-semibold rounded-lg uppercase {{ request()->fullUrlIs($menu->url) ? 'text-primary-600 bg-primary-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' }}">
                                         {{ $menu->label }}
                                         <svg class="w-3.5 h-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                     </button>
                                     <div x-show="open" x-cloak @click.outside="open = false" class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                                         @foreach($menu->children as $child)
-                                            <a href="{{ $child->url }}" wire:navigate class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ $child->label }}</a>
+                                            <a href="{{ $child->url }}" wire:navigate class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 uppercase font-semibold">{{ $child->label }}</a>
                                         @endforeach
                                     </div>
                                 </div>
                             @else
-                                <a href="{{ $menu->url }}" wire:navigate class="px-4 py-2 text-sm font-medium rounded-lg {{ request()->fullUrlIs($menu->url) ? 'text-primary-600 bg-primary-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' }}">{{ $menu->label }}</a>
+                                <a href="{{ $menu->url }}" wire:navigate class="px-4 py-2 text-sm font-semibold rounded-lg uppercase {{ request()->fullUrlIs($menu->url) ? 'text-primary-600 bg-primary-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50' }}">{{ $menu->label }}</a>
                             @endif
                         @endforeach
                     </div>

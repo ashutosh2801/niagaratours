@@ -6,10 +6,62 @@
     display: none !important;
 }
 
+@font-face {
+    font-family: 'FreightSansPro';
+    src: url('../fonts/FreightSansProBlack-Regular.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'FreightSansPro';
+    src: url('../fonts/FreightSansProBold-Regular.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'FreightSansPro';
+    src: url('../fonts/FreightSansProBook-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'FreightSansPro';
+    src: url('../fonts/FreightSansProLight-Regular.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'FreightSansPro';
+    src: url('../fonts/FreightSansProMedium-Regular.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'FreightSansPro';
+    src: url('../fonts/FreightSansProSemibold-Regular.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+}
+
 body {
     font-size: 100%;
+    font-family: 'FreightSansPro', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-size: 2rem;
+}
+
+.font-sans {
+    font-family: 'Poppins', sans-serif;
+}
+
+.top-bar .phone-num {
+    display: flex;
+    gap: 5px;
 }
