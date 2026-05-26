@@ -273,7 +273,7 @@
                         </div>
                     @endif
                 </div>
-            </div>
+            </div>h         g
 
             {{-- Right Column -- Sticky Booking Card --}}
             <div class="lg:w-1/3">
