@@ -724,11 +724,11 @@
 
             if (window.scrollY > 20) {
 
-                header.classList.add('shadow-md');
+                header.classList.add('shadow-lg');
 
             } else {
 
-                header.classList.remove('shadow-md');
+                header.classList.remove('shadow-lg');
             }
 
         });

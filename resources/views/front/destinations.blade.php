@@ -1,16 +1,47 @@
 <div>
-    <section class="bg-gray-50 border-b border-gray-200">
-        <x-breadcrumbs :items="[
-            ['label' => 'All Destinations'],
-        ]" />
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-            <h1 class="text-3xl font-bold text-gray-900">All Destinations</h1>
-            <p class="mt-2 text-gray-600">Explore all our amazing destinations and find your next adventure.</p>
+    {{-- =========================
+        TOP HERO SECTION
+    ========================== --}}
+    <section>
+        <div class="bg-[#F8FAFB] border-t border-b border-gray-200">
+
+            <div class="container-fluid mx-auto px-4 py-10">
+
+                {{-- Breadcrumb --}}
+                <div class="flex items-center gap-2 text-sm text-gray-500 mb-8">
+
+                    <a href="{{ route('home') }}"
+                    class="hover:text-primary-600 transition">
+                        Home
+                    </a>
+
+                    <svg class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"/>
+                    </svg>
+
+                    <span class="text-gray-700 truncate">
+                        All Destinations
+                    </span>
+
+                </div>
+
+                {{-- Title --}}
+                <h1 class="text-4xl lg:text-5xl font-bold text-black leading-tight w-full">
+                    All Destinations
+                </h1>
+                <p class="mt-2 text-gray-600">Explore all our amazing destinations and find your next adventure.</p>
+            </div>
         </div>
     </section>
 
     <section class="py-12 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4">
+        <div class="container-fluid mx-auto px-4">
             @if($destinations->isNotEmpty())
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach($destinations as $destination)
