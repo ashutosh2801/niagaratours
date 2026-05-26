@@ -26,7 +26,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Address</h3>
-                            <p class="text-sm text-gray-600 mt-1">1 Dundas Street West, Suite 2500<br>Toronto, ON, M5G 1Z3</p>
+                            <p class="text-sm text-gray-600 mt-1">5853 Royal Manor Dr, Niagara Falls, ON L2G 1W4, Canada</p>
                         </div>
                     </div>
 
@@ -47,7 +47,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Email</h3>
-                            <a href="mailto:info@tourbeez.com" class="text-sm text-primary-600 hover:text-primary-700 mt-1 block">info@tourbeez.com</a>
+                            <a href="mailto:info@niagaratours.com" class="text-sm text-primary-600 hover:text-primary-700 mt-1 block">info@niagaratours.com</a>
                             <p class="text-xs text-gray-500 mt-0.5">We respond within 2 hours</p>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
                             <div class="text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <p class="text-sm">Google Map Placeholder</p>
-                                <p class="text-xs">1 Dundas Street West, Toronto, ON</p>
+                                <p class="text-xs">5853 Royal Manor Dr, Niagara Falls, ON L2G 1W4, Canada</p>
                             </div>
                         </div>
                     </div>

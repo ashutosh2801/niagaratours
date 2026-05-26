@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Destination;
 use App\Models\HomepageSection;
 use App\Models\Tour;
 use Livewire\Attributes\Layout;
@@ -36,6 +37,20 @@ class SectionList extends Component
     public $selectedPopularTours = [];
     public $browseTitle;
     public $browseSubtitle;
+
+    // Features (Icon Grid)
+    public $featuresTitle;
+    public $featuresSubtitle;
+    public $featuresItems = [];
+
+    // Destinations
+    public $destinationsTitle;
+    public $destinationsSubtitle;
+    public $selectedDestinations = [];
+
+    // Policies
+    public $policiesTitle;
+    public $policiesItems = [];
 
     // FAQ
     public $faqBadgeText;
@@ -106,6 +121,27 @@ class SectionList extends Component
             $this->popToursTitle = $pt->settings['title'] ?? 'Popular Tours';
             $this->popToursSubtitle = $pt->settings['subtitle'] ?? '';
             $this->selectedPopularTours = $pt->settings['tour_ids'] ?? [];
+        }
+
+        if ($feat = $sections->get('features')) {
+            $this->featuresTitle = $feat->settings['title'] ?? 'Why Choose Niagara Tours';
+            $this->featuresSubtitle = $feat->settings['subtitle'] ?? '';
+            $this->featuresItems = $feat->settings['features'] ?? [
+                ['icon' => '', 'title' => '', 'description' => ''],
+            ];
+        }
+
+        if ($dest = $sections->get('destinations')) {
+            $this->destinationsTitle = $dest->settings['title'] ?? 'Destinations Around the World';
+            $this->destinationsSubtitle = $dest->settings['subtitle'] ?? '';
+            $this->selectedDestinations = $dest->settings['destination_ids'] ?? [];
+        }
+
+        if ($pol = $sections->get('policies')) {
+            $this->policiesTitle = $pol->settings['title'] ?? '';
+            $this->policiesItems = $pol->settings['items'] ?? [
+                ['image' => '', 'badge' => '', 'title' => '', 'description' => '', 'overlay_from' => '', 'overlay_to' => ''],
+            ];
         }
 
         if ($faq = $sections->get('faq')) {
@@ -185,6 +221,16 @@ class SectionList extends Component
             $this->ctaBgImage = $url;
         } elseif ($target === 'promo_bg') {
             $this->promoBgImage = $url;
+        } elseif ($target === 'features_icon') {
+            $index = session()->get('features_icon_index');
+            if ($index !== null && isset($this->featuresItems[$index])) {
+                $this->featuresItems[$index]['icon'] = $url;
+            }
+        } elseif ($target === 'policies_image') {
+            $index = session()->get('policies_image_index');
+            if ($index !== null && isset($this->policiesItems[$index])) {
+                $this->policiesItems[$index]['image'] = $url;
+            }
         } else {
             $index = session()->get('hero_slide_index');
             if ($index !== null && isset($this->heroSlides[$index])) {
@@ -192,7 +238,7 @@ class SectionList extends Component
             }
         }
 
-        session()->forget(['mediaPicker_target', 'hero_slide_index']);
+        session()->forget(['mediaPicker_target', 'hero_slide_index', 'features_icon_index', 'policies_image_index']);
     }
 
     public function addHeroSlide()
@@ -213,6 +259,28 @@ class SectionList extends Component
     public function removeWhyFeature($index)
     {
         array_splice($this->whyFeatures, $index, 1);
+    }
+
+    public function addFeatureItem()
+    {
+        $this->featuresItems[] = ['icon' => '', 'title' => '', 'description' => ''];
+    }
+
+    public function removeFeatureItem($index)
+    {
+        array_splice($this->featuresItems, $index, 1);
+    }
+
+    public function openMediaPickerForFeatures($index)
+    {
+        session()->put('mediaPicker_target', 'features_icon');
+        session()->put('features_icon_index', $index);
+    }
+
+    public function openMediaPickerForPolicies($index)
+    {
+        session()->put('mediaPicker_target', 'policies_image');
+        session()->put('policies_image_index', $index);
     }
 
     public function addFaqItem()
@@ -256,6 +324,20 @@ class SectionList extends Component
             'browse_categories' => [
                 'title' => $this->browseTitle,
                 'subtitle' => $this->browseSubtitle,
+            ],
+            'features' => [
+                'title' => $this->featuresTitle,
+                'subtitle' => $this->featuresSubtitle,
+                'features' => $this->featuresItems,
+            ],
+            'destinations' => [
+                'title' => $this->destinationsTitle,
+                'subtitle' => $this->destinationsSubtitle,
+                'destination_ids' => array_map('intval', $this->selectedDestinations),
+            ],
+            'policies' => [
+                'title' => $this->policiesTitle,
+                'items' => $this->policiesItems,
             ],
             'faq' => [
                 'badge_text' => $this->faqBadgeText,
@@ -302,6 +384,7 @@ class SectionList extends Component
     {
         $sections = HomepageSection::orderBy('sort_order')->get();
         $tours = Tour::where('is_active', true)->orderBy('title')->get();
-        return view('components.admin.section-list', compact('sections', 'tours'));
+        $destinations = Destination::where('is_active', true)->orderBy('sort_order')->get();
+        return view('components.admin.section-list', compact('sections', 'tours', 'destinations'));
     }
 }

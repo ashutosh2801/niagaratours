@@ -21,12 +21,32 @@ use App\Livewire\Admin\DestinationForm;
 
 Route::view('/', 'welcome')->name('home');
 Route::get('/tours', App\Livewire\Front\TourList::class)->name('tours');
+Route::get('/destinations', App\Livewire\Front\DestinationList::class)->name('destinations');
 Route::get('/tour/{slug}', TourDetail::class)->name('tour.detail');
 Route::get('/booking/{tour_id}', BookingForm::class)->name('booking');
 Route::view('/booking-confirmation', 'front.booking-confirmation')->name('booking.confirmation');
 Route::view('/about', 'front.about')->name('about');
 Route::view('/contact', 'front.contact')->name('contact');
 Route::get('/page/{page}', App\Livewire\Front\PageShow::class)->name('page.show');
+
+Route::get('/api/tours/search', function (\Illuminate\Http\Request $request) {
+    $q = $request->get('q');
+    if (!$q || strlen($q) < 2) {
+        return response()->json([]);
+    }
+    return response()->json(
+        \App\Models\Tour::where('is_active', true)
+            ->where(function ($query) use ($q) {
+                $query->where('title', 'like', '%' . $q . '%')
+                      ->orWhere('short_description', 'like', '%' . $q . '%')
+                      ->orWhere('location', 'like', '%' . $q . '%');
+            })
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('title')
+            ->limit(8)
+            ->get(['id', 'title', 'slug', 'location', 'featured_image as image'])
+    );
+})->name('api.tours.search');
 
 Route::get('/stripe/success', [StripeController::class, 'success'])->name('stripe.success');
 Route::get('/stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');

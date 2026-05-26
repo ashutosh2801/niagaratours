@@ -241,6 +241,130 @@
                                     @endif
                                 </div>
 
+                            @elseif($section->key === 'features')
+                                <div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                            <input type="text" wire:model="featuresTitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+                                            <input type="text" wire:model="featuresSubtitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Feature Items</h4>
+                                        <button type="button" wire:click="addFeatureItem" class="text-xs font-medium text-primary-600 hover:text-primary-700">+ Add Feature</button>
+                                    </div>
+                                    <div class="space-y-3">
+                                        @foreach($featuresItems ?? [] as $i => $item)
+                                            <div wire:key="feature-{{ $i }}" class="border border-gray-200 rounded-lg p-4">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-xs font-medium text-gray-600">Feature {{ $i + 1 }}</span>
+                                                    @if(count($featuresItems) > 1)
+                                                        <button type="button" wire:click="removeFeatureItem({{ $i }})" class="text-xs text-red-600">Remove</button>
+                                                    @endif
+                                                </div>
+                                                <div class="space-y-3">
+                                                    <div>
+                                                        <div class="flex items-center justify-between mb-1">
+                                                            <label class="block text-xs font-medium text-gray-600">Icon</label>
+                                                            <button type="button" x-data @click="$wire.openMediaPickerForFeatures({{ $i }}).then(() => $dispatch('openMediaPicker'))" class="text-xs text-primary-600 hover:text-primary-700">Choose from Media</button>
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            @if($item['icon'])
+                                                                <img src="{{ $item['icon'] }}" class="h-10 w-10 object-contain border border-gray-200 rounded">
+                                                            @endif
+                                                            <input type="url" wire:model="featuresItems.{{ $i }}.icon" placeholder="Icon URL" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                        </div>
+                                                    </div>
+                                                    <input type="text" wire:model="featuresItems.{{ $i }}.title" placeholder="Feature title" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                    <textarea wire:model="featuresItems.{{ $i }}.description" rows="2" placeholder="Feature description" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                             @elseif($section->key === 'destinations')
+                                <div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                            <input type="text" wire:model="destinationsTitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+                                            <input type="text" wire:model="destinationsSubtitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-3">Select Destinations to Display</label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                            @foreach($destinations ?? [] as $destination)
+                                                <label wire:key="dest-{{ $destination->id }}" class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors {{ in_array($destination->id, $selectedDestinations ?? []) ? 'border-primary-500 bg-primary-50' : '' }}">
+                                                    <input type="checkbox" wire:model="selectedDestinations" value="{{ $destination->id }}" class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                                                    <div class="min-w-0">
+                                                        <p class="text-sm font-medium text-gray-900 truncate">{{ $destination->name }}</p>
+                                                        @if($destination->image)
+                                                            <img src="{{ $destination->image }}" class="h-10 w-16 object-cover rounded mt-1">
+                                                        @endif
+                                                    </div>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                        @if(empty($destinations))
+                                            <p class="text-sm text-gray-400 italic">No active destinations available. Create them in the Destinations section.</p>
+                                        @endif
+                                    </div>
+                                </div>
+
+                            @elseif($section->key === 'policies')
+                                <div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                        <input type="text" wire:model="policiesTitle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    </div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Policy Cards</h4>
+                                        <button type="button" wire:click="addPolicyItem" class="text-xs font-medium text-primary-600 hover:text-primary-700">+ Add Card</button>
+                                    </div>
+                                    <div class="space-y-3">
+                                        @foreach($policiesItems ?? [] as $i => $item)
+                                            <div wire:key="policy-{{ $i }}" class="border border-gray-200 rounded-lg p-4">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-xs font-medium text-gray-600">Card {{ $i + 1 }}</span>
+                                                    @if(count($policiesItems) > 1)
+                                                        <button type="button" wire:click="removePolicyItem({{ $i }})" class="text-xs text-red-600">Remove</button>
+                                                    @endif
+                                                </div>
+                                                <div class="space-y-3">
+                                                    <div>
+                                                        <div class="flex items-center justify-between mb-1">
+                                                            <label class="block text-xs font-medium text-gray-600">Background Image</label>
+                                                            <button type="button" x-data @click="$wire.openMediaPickerForPolicies({{ $i }}).then(() => $dispatch('openMediaPicker'))" class="text-xs text-primary-600 hover:text-primary-700">Choose from Media</button>
+                                                        </div>
+                                                        @if($item['image'])
+                                                            <img src="{{ $item['image'] }}" class="h-24 w-full object-cover rounded-lg border border-gray-200 mb-2">
+                                                        @endif
+                                                        <input type="url" wire:model="policiesItems.{{ $i }}.image" placeholder="Image URL" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-3">
+                                                        <input type="text" wire:model="policiesItems.{{ $i }}.badge" placeholder="Badge text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                        <input type="text" wire:model="policiesItems.{{ $i }}.title" placeholder="Title" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                    </div>
+                                                    <textarea wire:model="policiesItems.{{ $i }}.description" rows="2" placeholder="Description" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
+                                                    <div class="grid grid-cols-2 gap-3">
+                                                        <input type="text" wire:model="policiesItems.{{ $i }}.overlay_from" placeholder="Overlay color from (e.g. #0ad6c7)" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                        <input type="text" wire:model="policiesItems.{{ $i }}.overlay_to" placeholder="Overlay color to (e.g. #0c8d89)" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
                             @elseif($section->key === 'faq')
                                 <div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
