@@ -6,51 +6,30 @@
     display: none !important;
 }
 
-@font-face {
-    font-family: 'FreightSansPro';
-    src: url('../fonts/FreightSansProBlack-Regular.woff2') format('woff2');
-    font-weight: 900;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'FreightSansPro';
-    src: url('../fonts/FreightSansProBold-Regular.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'FreightSansPro';
-    src: url('../fonts/FreightSansProBook-Regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'FreightSansPro';
-    src: url('../fonts/FreightSansProLight-Regular.woff2') format('woff2');
-    font-weight: 300;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'FreightSansPro';
-    src: url('../fonts/FreightSansProMedium-Regular.woff2') format('woff2');
-    font-weight: 500;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'FreightSansPro';
-    src: url('../fonts/FreightSansProSemibold-Regular.woff2') format('woff2');
-    font-weight: 600;
-    font-style: normal;
-}
-
 body {
-    font-size: 100%;
-    font-family: 'FreightSansPro', sans-serif;
+    font-family: "Urbanist", sans-serif;
+}
+
+@media (min-width: 1550px) {
+    .container-fluid {
+        max-width: 1600px !important;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container-fluid {
+        max-width: 1450px;
+    }
+}
+@media (min-width: 1024px) {
+    
+    .container {
+        max-width: 1120px;
+    }
+}
+
+.container-fluid {
+    width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -61,7 +40,62 @@ h1, h2, h3, h4, h5, h6 {
     font-family: 'Poppins', sans-serif;
 }
 
-.top-bar .phone-num {
-    display: flex;
-    gap: 5px;
+input[type="date"]::-webkit-calendar-picker-indicator{
+    opacity:0;
+    cursor:pointer;
+    position:absolute;
+    width:100%;
+    left:0;
+}
+
+input:focus{
+    outline:none !important;
+    box-shadow:none !important;
+}
+
+@keyframes slowZoom{
+    0%{
+        transform:scale(1);
+    }
+    100%{
+        transform:scale(1.08);
+    }
+}
+
+.animate-slowZoom{
+    animation:slowZoom 8s linear infinite alternate;
+}
+
+.destinations .swiper-button-prev, 
+.destinations .swiper-rtl .swiper-button-next {
+    left: -20px;
+    right: auto;
+}
+
+.destinations .swiper-button-next, 
+.destinations .swiper-rtl .swiper-button-prev {
+    right: -20px;
+    left: auto;
+}
+
+.destinations .swiper-button-next:after, 
+.destinations .swiper-button-prev:after {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+@media (min-width: 1280px) {
+
+    .destinations .swiper-button-prev, 
+    .destinations .swiper-rtl .swiper-button-next {
+        left: -10px;
+        right: auto;
+    }
+
+    .destinations .swiper-button-next, 
+    .destinations .swiper-rtl .swiper-button-prev {
+        right: -10px;
+        left: auto;
+    }
+
 }

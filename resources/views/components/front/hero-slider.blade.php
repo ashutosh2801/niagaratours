@@ -1,68 +1,284 @@
-<div>
-    <div class="relative bg-gray-900 overflow-hidden" id="hellobackground" style="min-height: 90vh; background-image: url('{{ !empty($slides[0]['image'] ?? '') ? $slides[0]['image'] : 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?auto=format&fit=crop&w=1920&q=80' }}'); background-size: cover; background-position: center;">
-        <div class="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/60 to-gray-900/30"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/70 via-transparent to-gray-900/10"></div>
+{{-- HERO SECTION --}}
+<section
+    x-data="heroSlider()"
+    x-init="startSlider()"
+    class="relative overflow-hidden md:rounded-[34px] container-fluid mx-auto md:px-4"
+    style="height: 80vh;"
+>
+    <!-- BACKGROUND SLIDES -->
+    <template x-for="(slide, index) in slides" :key="index">
+        <div
+            x-show="currentSlide === index"
+            x-transition:enter="transition-opacity duration-[2000ms] ease-out"
+            x-transition:enter-start="opacity-0 scale-105"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition-opacity duration-[2000ms] ease-in"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-110"
+            class="absolute inset-0"
+        >
+            <div
+                class="absolute inset-0 bg-cover bg-center bg-no-repeat scale-100 animate-slowZoom"
+                :style="`background-image:url(${slide})`"
+            ></div>
+        </div>
+    </template>
 
-        <div class="relative h-full flex items-center" style="min-height: 90vh;">
-            <div class="max-w-7xl mx-auto px-4 w-full">
-                <div class="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-12">
-                    <!-- Left: Text Content -->
-                    <div class="flex-1 max-w-2xl">
-                        <h1 class="text-6xl md:text-8xl lg:text-8xl font-black text-white leading-none">
-                            TOURS FOR YOUR SENSES
-                        </h1>
-                        <p class="mt-6 text-xl md:text-2xl text-gray-200 max-w-2xl leading-relaxed">
-                            Niagara Tours provides the <strong>BEST</strong> <strong>Niagara Falls tours</strong> for a great day out with your friends. #goniagara
-                        </p>
+    <!-- OVERLAY -->
+    <div class="absolute inset-0 bg-black/20"></div>
+
+    <!-- CONTENT -->
+    <div class="relative z-10 flex items-center justify-center h-full px-4">
+        <div class="w-full md:max-w-6xl text-center">
+
+            <!-- HEADING -->
+            <h1
+                class="text-white font-semibold leading-tight
+                text-[30px] md:text-[40px]
+                drop-shadow-[0_4px_12px_rgba(0,0,0,0.65)]"
+            >
+                Millions Of Experiences. One Simple Search.
+            </h1>
+
+            <!-- SUBTEXT -->
+            <p
+                class="text-white/95 mt-5
+                text-[16px] md:text-[20px]
+                font-bold
+                drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+            >
+                Find what makes you happy anytime, anywhere
+            </p>
+
+            <!-- DESKTOP SEARCH -->
+            <div
+                class="hidden md:flex items-center justify-between
+                bg-white/95 backdrop-blur-md
+                rounded-full
+                shadow-[0_20px_60px_rgba(0,0,0,0.25)]
+                mt-12
+                mx-auto
+                max-w-3xl
+                h-[75px]
+                px-4"
+            >
+
+                <!-- LOCATION -->
+                <div class="flex items-center gap-4 flex-1">
+
+                    <!-- ICON -->
+                    <div class="text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-7 h-7"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
                     </div>
 
-                    <!-- Right: 2x2 Category Image Grid -->
-                    @php
-                        $heroCategories = \App\Models\Category::where('is_active', true)->orderBy('sort_order')->take(4)->get();
-                    @endphp
-                    @if($heroCategories->isNotEmpty())
-                    <div class="w-full lg:w-auto shrink-0">
-                        <div class="grid grid-cols-2 gap-4 md:gap-5">
-                            @foreach($heroCategories as $index => $cat)
-                                @php
-                                    $links = [
-                                        route('tours', ['selectedCategories' => [$cat->id]]),
-                                        route('tours', ['selectedCategories' => [$cat->id]]),
-                                        route('tours', ['selectedCategories' => [$cat->id]]),
-                                        route('tours'),
-                                    ];
-                                    $colors = ['border-primary-500', 'border-amber-400', 'border-pink-500', 'border-emerald-500'];
-                                @endphp
-                                <a href="{{ $links[$index] ?? route('tours') }}" wire:navigate
-                                   class="group relative block w-44 h-44 md:w-64 md:h-64 rounded-xl overflow-hidden border-2 {{ $colors[$index] ?? 'border-white/30' }} hover:shadow-2xl hover:shadow-black/50 transition-all duration-300">
-                                    @if($cat->image)
-                                        <img src="{{ $cat->image }}" alt="{{ $cat->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                    @else
-                                        <div class="w-full h-full bg-gray-800"></div>
-                                    @endif
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-                                    <div class="absolute bottom-3 left-3 right-3 flex items-center gap-2">
-                                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm text-white group-hover:bg-primary-500 transition-colors duration-300">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                        </span>
-                                        <span class="text-white group-hover:text-primary-300 text-lg md:text-xl font-bold drop-shadow-lg uppercase tracking-wide">{{ $cat->name }}</span>
-                                    </div>
-                                </a>
-                            @endforeach
-                        </div>
+                    <!-- INPUT -->
+                    <div class="text-left w-full">
+                        <label class="block text-[14px] font-semibold text-gray-800">
+                            Where To?
+                        </label>
+
+                        <input
+                            type="text"
+                            placeholder="Search a place or activitiy Destination"
+                            class="w-full bg-transparent border-none outline-none
+                            text-[15px] text-gray-500
+                            placeholder:text-gray-400 mt-1"
+                        >
                     </div>
-                    @endif
                 </div>
+
+                <!-- DIVIDER -->
+                <div class="w-px h-12 bg-gray-200 mx-8"></div>
+
+                <!-- DATE -->
+                <div class="flex items-center gap-4 flex-1">
+
+                    <!-- ICON -->
+                    <div class="text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-7 h-7"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+
+                    <!-- DATE -->
+                    <div class="text-left w-full">
+                        <label class="block text-[14px] font-semibold text-gray-800">
+                            When?
+                        </label>
+
+                        <input
+                            type="date"
+                            class="w-full bg-transparent border-none outline-none text-gray-500 mt-1 text-[15px]"
+                        >
+                    </div>
+                </div>
+
+                <!-- SEARCH BUTTON -->
+                <button
+                    class="w-[50px] h-[50px]
+                    rounded-full
+                    bg-[#c53a2f]
+                    hover:bg-[#b63429]
+                    transition
+                    flex items-center justify-center
+                    shadow-lg"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="w-5 h-5 text-white"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- MOBILE SEARCH -->
+            <div
+                class="md:hidden
+                bg-white
+                rounded-[28px]
+                mt-10
+                p-6"
+            >
+
+                <!-- LOCATION -->
+                <div class="flex gap-4 items-start">
+
+                    <div class="pt-1 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-6 h-6"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+
+                    <div class="w-full text-left">
+                        <label class="block text-[14px] font-semibold text-gray-800">
+                            Where To?
+                        </label>
+
+                        <input
+                            type="text"
+                            placeholder="Search a place or Destination"
+                            class="w-full bg-transparent border-none outline-none
+                            text-[14px] text-gray-500
+                            placeholder:text-gray-400 mt-1"
+                        >
+                    </div>
+                </div>
+
+                <!-- DIVIDER -->
+                <div class="h-px bg-gray-200 my-6"></div>
+
+                <!-- DATE -->
+                <div class="flex gap-4 items-start">
+
+                    <div class="pt-1 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-6 h-6"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+
+                    <div class="w-full text-left">
+                        <label class="block text-[14px] font-semibold text-gray-800">
+                            When?
+                        </label>
+
+                        <input
+                            type="date"
+                            class="w-full bg-transparent border-none outline-none
+                            text-[14px] text-gray-500 mt-1"
+                        >
+                    </div>
+                </div>
+
+                <!-- BUTTON -->
+                <button
+                    class="mt-8 w-full h-[50px]
+                    rounded-full
+                    bg-[#c53a2f]
+                    hover:bg-[#b63429]
+                    transition
+                    flex items-center justify-center gap-3"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="w-6 h-6 text-white"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+
+                    <span class="text-white text-[17px] font-semibold">
+                        Search
+                    </span>
+                </button>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- ONLY THE BEST bar -->
-    <div class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-6 md:py-8">
-            <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 text-center lg:text-left">
-                ONLY THE BEST <span class="text-primary-600">NIAGARA FALLS</span> TOURS
-            </h2>
-        </div>
-    </div>
-</div>
+{{-- ALPINE --}}
+<script>
+    function heroSlider() {
+        return {
+            currentSlide: 0,
+
+            slides: [
+                'images/slides/01.jpg',
+                'images/slides/02.jpg',
+                'images/slides/03.jpg',
+            ],
+
+            startSlider() {
+                setInterval(() => {
+                    this.currentSlide =
+                        (this.currentSlide + 1) % this.slides.length;
+                }, 5000);
+            }
+        }
+    }
+</script>
