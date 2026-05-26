@@ -12,13 +12,13 @@ body {
 
 @media (min-width: 1550px) {
     .container-fluid {
-        max-width: 1600px !important;
+        max-width: 1400px !important;
     }
 }
 
 @media (min-width: 1280px) {
     .container-fluid {
-        max-width: 1450px;
+        max-width: 1360px;
     }
 }
 @media (min-width: 1024px) {
@@ -84,7 +84,7 @@ input:focus{
     font-weight: bold;
 }
 
-@media (min-width: 1280px) {
+@media (max-width: 1280px) {
 
     .destinations .swiper-button-prev, 
     .destinations .swiper-rtl .swiper-button-next {
