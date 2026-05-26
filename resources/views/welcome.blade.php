@@ -36,94 +36,831 @@
 
     {{-- ==================== TOUR CARDS GRID (Popular Tours) ==================== --}}
     @if($ptTours->isNotEmpty())
-    <section class="py-16 md:py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12 md:mb-16">
-                <p class="text-sm font-semibold text-primary-600 uppercase tracking-widest mb-3">Popular Tours</p>
-                <h2 class="text-3xl md:text-5xl font-bold text-gray-900">{{ $popularSettings['title'] ?? 'Discover Niagara Falls' }}</h2>
-                @if(!empty($popularSettings['subtitle']))
-                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">{{ $popularSettings['subtitle'] }}</p>
-                @endif
+    <section class="relative py-10">
+        <div class="container-fluid mx-auto px-4">
+
+            {{-- Heading --}}
+            <div class="text-center mb-10">
+
+                <h2 class="text-2xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
+                    {{ $popularSettings['title'] ?? 'Popular Tours' }}
+                </h2>
+
+                <p class="mt-2 text-sm leading-tight text-gray-500 max-w-xl mx-auto">
+                    {{ $popularSettings['subtitle'] ?? 'Curated premium journeys crafted for unforgettable adventures, breathtaking destinations, and elevated travel experiences.' }}
+                </p>
+
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {{-- Grid --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+
                 @foreach($ptTours as $tour)
-                    @php $startingPrice = $tour->starting_price ?: $tour->price; @endphp
-                    <div class="group bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300">
-                        <div class="relative h-56 overflow-hidden">
-                            <img src="{{ $tour->featured_image ?? ($tour->images[0] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80') }}" alt="{{ $tour->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
 
-                            @if($loop->first)
-                                <span class="absolute top-4 left-4 px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full shadow-lg">Likely to Sell Out</span>
-                            @endif
+                    @php
+                        $startingPrice = $tour->starting_price ?: $tour->price;
+                        $oldPrice = $startingPrice ? $startingPrice + 70 : 280;
 
-                            <span class="absolute top-4 right-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold rounded-full shadow-lg">
-                                {{ $tour->duration_type ? str_replace('-', ' ', $tour->duration_type) : 'Full Day' }}
-                            </span>
+                        $image =
+                            $tour->featured_image ??
+                            ($tour->images[0] ??
+                            'https://images.unsplash.com/photo-1541417904950-b855846fe074?q=80&w=1200&auto=format&fit=crop');
 
-                            <div class="absolute bottom-4 left-4">
-                                @if($startingPrice)
-                                    <span class="px-3 py-1.5 bg-white text-primary-600 text-sm font-bold rounded-full shadow-lg">
-                                        From ${{ number_format($startingPrice, 0) }}
-                                    </span>
+                        $rating = $tour->rating ?? 5;
+                    @endphp
+
+                    {{-- Card --}}
+                    <div class="group relative">
+
+                        {{-- Glass Card --}}
+                        <div class="relative h-full rounded-[24px] bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_20px_20px_rgba(15,23,42,0.08)] overflow-hidden transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_20px_20px_rgba(15,23,42,0.18)]">
+
+                            {{-- Image --}}
+                            <div class="relative overflow-hidden">
+
+                                <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate>
+                                    <img
+                                        src="{{ $image }}"
+                                        alt="{{ $tour->title }}"
+                                        class="w-full h-[280px] object-cover transition duration-[1200ms] group-hover:scale-110"
+                                    >
+                                </a>
+
+                                {{-- Overlay --}}
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+                                {{-- Floating Badge --}}
+                                @if($loop->first)
+                                    <div class="absolute top-5 left-5">
+                                        <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-xs font-semibold tracking-wide shadow-lg">
+                                            Likely to Sell Out
+                                        </div>
+                                    </div>
                                 @endif
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors leading-tight">
-                                <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate>{{ $tour->title }}</a>
-                            </h3>
-                            @if($tour->short_description)
-                                <p class="text-sm text-gray-500 mb-4 line-clamp-2 leading-relaxed">{{ $tour->short_description }}</p>
-                            @endif
-                            <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                                <span class="flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    {{ $tour->duration ? $tour->duration . ' Hours' : '6 Hours' }}
-                                </span>
-                                @if($tour->max_people)
-                                <span class="flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    1-{{ $tour->max_people }}
-                                </span>
-                                @endif
-                            </div>
-                            <div class="flex items-center gap-1.5 mb-5">
-                                <div class="flex items-center">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= round($tour->rating ?? 5))
-                                            <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                        @else
-                                            <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                        @endif
-                                    @endfor
+
+                                {{-- Rating --}}
+                                <div class="absolute top-5 right-5">
+
+                                    <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+
+                                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921
+                                            1.902 0l1.07 3.292a1 1 0 00.95.69h3.462
+                                            c.969 0 1.371 1.24.588 1.81l-2.8
+                                            2.034a1 1 0 00-.364 1.118l1.07
+                                            3.292c.3.921-.755 1.688-1.54
+                                            1.118l-2.8-2.034a1 1 0
+                                            00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118
+                                            l1.07-3.292a1 1 0
+                                            00-.364-1.118L2.98
+                                            8.72c-.783-.57-.38-1.81.588-1.81h3.461a1
+                                            1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+
+                                        <span class="text-white text-sm font-bold">
+                                            {{ number_format($rating,1) }}
+                                        </span>
+
+                                    </div>
+
                                 </div>
-                                <span class="text-sm font-bold text-gray-900">{{ number_format($tour->rating ?? 5, 1) }}</span>
-                                <span class="text-sm text-gray-400">({{ $tour->review_count }})</span>
+
+                                {{-- Bottom Content --}}
+                                <div class="absolute bottom-0 left-0 right-0 p-6">
+
+                                    {{-- Price --}}
+                                    <div class="flex items-end justify-between">
+
+                                        <div>
+
+                                            <div class="text-white/60 line-through text-sm mb-1">
+                                                ${{ number_format($oldPrice, 2) }}
+                                            </div>
+
+                                            <div class="flex items-end gap-1">
+
+                                                <span class="text-white/70 text-sm mb-1">
+                                                    From
+                                                </span>
+
+                                                <span class="text-3xl font-bold text-white leading-none">
+                                                    ${{ number_format($startingPrice ?? 210, 0) }}
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                        {{-- Arrow Button --}}
+                                        <a
+                                            href="{{ route('tour.detail', $tour->slug) }}"
+                                            wire:navigate
+                                            class="w-10 h-10 rounded-2xl bg-white text-gray-900 flex items-center justify-center shadow-2xl transition-all duration-300 hover:bg-primary-600 hover:text-white hover:scale-110"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-4 h-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                            </svg>
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
                             </div>
-                            <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate class="block w-full text-center px-4 py-3 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-500 transition-colors shadow-lg shadow-primary-600/20">
-                                Book Now
-                            </a>
+
+                            {{-- Content --}}
+                            <div class="p-4">
+
+                                {{-- Title --}}
+                                <h3 class="text-[18px] font-bold leading-snug text-gray-900 mb-2 tracking-tight group-hover:text-primary-600 transition duration-300">
+
+                                    <a href="{{ route('tour.detail', $tour->slug) }}" wire:navigate>
+                                        {{ $tour->title }}
+                                    </a>
+
+                                </h3>
+
+                                {{-- Description --}}
+                                <p class="text-[15px] leading-tight text-gray-500 mb-5 line-clamp-1">
+                                    {{ $tour->short_description ?? 'Experience breathtaking destinations with luxury comfort, premium hospitality, and unforgettable memories.' }}
+                                </p>
+
+                                {{-- Divider --}}
+                                <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-6"></div>
+
+                                {{-- Features --}}
+                                <div class="grid grid-cols-2 gap-4">
+
+                                    {{-- Duration --}}
+                                    <div class="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100">
+
+                                        <div class="w-11 h-11 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-5 h-5 text-primary-600"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+
+                                        <div>
+
+                                            <div class="text-xs uppercase tracking-wide text-gray-400 font-semibold">
+                                                Duration
+                                            </div>
+
+                                            <div class="text-sm font-bold text-gray-900">
+                                                {{ $tour->duration ? $tour->duration . 'h' : '6h' }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    {{-- Guests --}}
+                                    <div class="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-100">
+
+                                        <div class="w-11 h-11 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-5 h-5 text-primary-600"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17
+                                                    20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7
+                                                    20H2v-2a3 3 0 015.356-1.857M7
+                                                    20v-2c0-.656.126-1.283.356-1.857m0
+                                                    0a5.002 5.002 0 019.288 0M15 7a3
+                                                    3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                        </div>
+
+                                        <div>
+
+                                            <div class="text-xs uppercase tracking-wide text-gray-400 font-semibold">
+                                                Guests
+                                            </div>
+
+                                            <div class="text-sm font-bold text-gray-900">
+                                                {{ $tour->max_people ? $tour->max_people : '12' }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                @endforeach
+
+            </div>
+
+            {{-- CTA --}}
+            <div class="flex justify-center mt-10">
+                <a
+                    href="{{ route('tours') }}"
+                    wire:navigate
+                    class="group inline-flex items-center gap-4 px-6 py-3 rounded-full bg-gray-900 hover:bg-primary-600 text-white text-sm font-bold uppercase shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-500 hover:scale-105"
+                >
+
+                    View All Tours
+
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center transition-all duration-300 group-hover:translate-x-1">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+
+                    </div>
+
+                </a>
+            </div>
+
+        </div>
+    </section>
+    @endif
+
+    {{-- ==================== WHY US ==================== --}}
+    <section class="py-10">
+        <div class="container-fluid mx-auto px-4">
+
+            {{-- Main Box --}}
+            <div class="bg-[#f7f7f7] rounded-[28px] px-8 md:px-14 py-12">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-10">
+
+                    {{-- Item 1 --}}
+                    <div class="text-center">
+
+                        {{-- Icon --}}
+                        <div class="flex justify-center mb-6">
+
+                            <img
+                                src="images/icons/icon-1.png"
+                                alt="Discover"
+                                class="w-[80px] h-[80px] object-contain"
+                            >
+
+                        </div>
+
+                        {{-- Title --}}
+                        <h3 class="text-[18px] leading-none font-bold text-gray-900">
+                            Discover the possibilities
+                        </h3>
+
+                        {{-- Text --}}
+                        <p class="mt-4 text-[14px] text-[#666] font-medium max-w-[260px] mx-auto">
+                            With nearly half a million attractions, hotels &
+                            more, you're sure to find joy.
+                        </p>
+
+                    </div>
+
+                    {{-- Item 2 --}}
+                    <div class="text-center">
+
+                        {{-- Icon --}}
+                        <div class="flex justify-center mb-6">
+
+                            <img
+                                src="images/icons/icon-2.png"
+                                alt="Deals"
+                                class="w-[80px] h-[80px] object-contain"
+                            >
+
+                        </div>
+
+                        {{-- Title --}}
+                        <h3 class="text-[18px] leading-none font-bold text-gray-900">
+                            Enjoy deals & delights
+                        </h3>
+
+                        {{-- Text --}}
+                        <p class="mt-4 text-[14px] text-[#666] font-medium max-w-[260px] mx-auto">
+                            Quality activities. Great prices. Plus, earn
+                            credits to save more.
+                        </p>
+
+                    </div>
+
+                    {{-- Item 3 --}}
+                    <div class="text-center">
+
+                        {{-- Icon --}}
+                        <div class="flex justify-center mb-6">
+
+                            <img
+                                src="images/icons/icon-3.png"
+                                alt="Explore"
+                                class="w-[80px] h-[80px] object-contain"
+                            >
+
+                        </div>
+
+                        {{-- Title --}}
+                        <h3 class="text-[18px] leading-none font-bold text-gray-900">
+                            Exploring made easy
+                        </h3>
+
+                        {{-- Text --}}
+                        <p class="mt-4 text-[14px] text-[#666] font-medium max-w-[260px] mx-auto">
+                            Book last minute, skip lines & get free
+                            cancellation for easier exploring.
+                        </p>
+
+                    </div>
+
+                    {{-- Item 4 --}}
+                    <div class="text-center">
+
+                        {{-- Icon --}}
+                        <div class="flex justify-center mb-6">
+
+                            <img
+                                src="images/icons/icon-4.png"
+                                alt="Trust"
+                                class="w-[80px] h-[80px] object-contain"
+                            >
+
+                        </div>
+
+                        {{-- Title --}}
+                        <h3 class="text-[18px] leading-none font-bold text-gray-900">
+                            Travel you can trust
+                        </h3>
+
+                        {{-- Text --}}
+                        <p class="mt-4 text-[14px] text-[#666] font-medium max-w-[260px] mx-auto">
+                            Read reviews & get reliable customer
+                            support. We're with you at every step.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    {{-- ==================== DESTINATIONS ==================== --}}
+    <section class="py-10">
+
+        <div class="container-fluid mx-auto px-4">
+
+            {{-- Heading --}}
+            <div class="text-center mb-12">
+
+                <h2 class="text-2xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
+                    Destinations Around the World
+                </h2>
+
+                <p class="mt-2 text-sm leading-tight text-gray-500 max-w-xl mx-auto">
+                    Nigaratours is a platform designed to connect fans with exclusive experiences.
+                </p>
+
+            </div>
+
+            {{-- Swiper --}}
+            <div class="relative destinations">
+
+                <div class="swiper destinationSwiper">
+
+                    <div class="swiper-wrapper">
+
+                        @php
+                            $destinations = [
+                                ['title'=>'India','image'=>'images/destinations/agra.jpg'],
+                                ['title'=>'New York','image'=>'images/destinations/new-york.jpg'],
+                                ['title'=>'Houston','image'=>'images/destinations/houston.jpg'],
+                                ['title'=>'Ottawa','image'=>'images/destinations/ottawa.jpg'],
+                                ['title'=>'Toronto','image'=>'images/destinations/toronto.jpg'],
+                            ];
+                        @endphp
+
+                        @foreach($destinations as $destination)
+
+                            <div class="swiper-slide">
+
+                                <div class="relative h-[450px] rounded-[22px] overflow-hidden group">
+                                    <a href="#">
+                                        <img
+                                            src="{{ asset($destination['image']) }}"
+                                            class="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+                                        >
+
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+                                        <div class="absolute bottom-8 text-center w-full">
+
+                                            <p class="text-white text-lg">
+                                                Things to do in
+                                            </p>
+
+                                            <h3 class="text-white text-xl md:text-xl font-bold mt-1">
+                                                {{ $destination['title'] }}
+                                            </h3>
+
+                                        </div>
+                                    </a>
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                </div>
+
+                {{-- Navigation Buttons --}}
+                <button class="swiper-button-prev !text-black !w-12 !h-12 bg-white rounded-full"></button>
+                <button class="swiper-button-next !text-black !w-12 !h-12 bg-white rounded-full"></button>
+
+            </div>
+
+            {{-- CTA --}}
+            <div class="flex justify-center mt-10">
+                <a
+                    href="{{ route('tours') }}"
+                    wire:navigate
+                    class="group inline-flex items-center gap-4 px-6 py-3 rounded-full bg-gray-900 hover:bg-primary-600 text-white text-sm font-bold uppercase shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-500 hover:scale-105"
+                >
+
+                    View All Destinations
+
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center transition-all duration-300 group-hover:translate-x-1">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+
+                    </div>
+
+                </a>
+            </div>
+
+        </div>
+
+    </section>
+
+    {{-- ==================== POLICIES ==================== --}}
+    <section class="py-10">
+        <div class="container-fluid mx-auto px-4">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-7">
+
+                <!-- CARD 1 -->
+                <div class="group relative overflow-hidden rounded-[34px] h-[340px]">
+
+                    <!-- Background -->
+                    <img
+                        src="images/banners/home-banner-1.jpg"
+                        alt=""
+                        class="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-110 transition duration-[3000ms] ease-out"
+                    />
+
+                    <!-- Luxury Overlay -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-[#0ad6c7]/90 via-[#0c8d89]/45 to-black/70"
+                    ></div>
+
+                    <!-- Glass Shine -->
+                    <div
+                        class="absolute inset-0 opacity-40 bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.18),transparent)] -translate-x-full group-hover:translate-x-full transition duration-[1800ms]"
+                    ></div>
+
+                    <!-- Border Glow -->
+                    <div
+                        class="absolute inset-0 rounded-[34px] border border-white/10"
+                    ></div>
+
+                    <!-- Content -->
+                    <div class="relative z-10 h-full flex items-center justify-center text-center p-9">
+
+                        <!-- Center Content -->
+                        <div>
+
+                            <div
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white text-[13px] tracking-[2px] uppercase font-medium"
+                            >
+                                Premium Benefits
+                            </div>
+
+                            <h2
+                                class="mt-7 text-white md:text-[46px] leading-[50px] font-semibold tracking-[-1.5px]"
+                            >
+                                Flexible Booking
+                            </h2>
+
+                            <p
+                                class="mt-5 text-white/80 text-[19px] leading-[33px] font-normal max-w-[500px] mx-auto"
+                            >
+                                Reserve elite experiences now and pay later with
+                                complete freedom to plan your journey your way.
+                            </p>
+
                         </div>
                     </div>
-                @endforeach
-            </div>
+                </div>
 
-            <div class="text-center mt-12">
-                <a href="{{ route('tours') }}" wire:navigate class="inline-flex items-center gap-2 px-8 py-3.5 border-2 border-primary-600 text-primary-600 font-bold rounded-xl hover:bg-primary-600 hover:text-white transition-all duration-200 text-sm">
-                    View All Tours
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </a>
+                <!-- CARD 2 -->
+                <div class="group relative overflow-hidden rounded-[34px] h-[340px]">
+
+                    <!-- Background -->
+                    <img
+                        src="images/banners/home-banner-2.jpg"
+                        alt=""
+                        class="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-110 transition duration-[3000ms] ease-out"
+                    />
+
+                    <!-- Overlay -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-[#2b175c]/95 via-[#122e79]/55 to-black/75"
+                    ></div>
+
+                    <!-- Shine -->
+                    <div
+                        class="absolute inset-0 opacity-40 bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.18),transparent)] -translate-x-full group-hover:translate-x-full transition duration-[1800ms]"
+                    ></div>
+
+                    <!-- Border -->
+                    <div
+                        class="absolute inset-0 rounded-[34px] border border-white/10"
+                    ></div>
+
+                    <!-- Content -->
+                    <div class="relative z-10 h-full flex items-center justify-center text-center p-9">
+
+                        <!-- Center Content -->
+                        <div>
+
+                            <div
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white text-[13px] tracking-[2px] uppercase font-medium"
+                            >
+                                Worry Free
+                            </div>
+
+                            <h2
+                                class="mt-7 text-white md:text-[46px] leading-[50px] font-semibold tracking-[-1.5px]"
+                            >
+                                Free Cancellation
+                            </h2>
+
+                            <p
+                                class="mt-5 text-white/80 text-[19px] leading-[33px] font-normal max-w-[500px] mx-auto"
+                            >
+                                Receive a complete refund when cancelling eligible
+                                experiences at least 24 hours before departure.
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
+
+    {{-- ==================== CLIENT FEEDBACKS ==================== --}}
+    @if($reviewsSection)
+        @php
+            $reviewSettings = $reviewsSection->settings;
+        @endphp
+        <section class="py-12 my-5 bg-[#f7f7f7] overflow-hidden">
+
+            <div class="container-fluid mx-auto px-4">
+
+                {{-- Heading --}}
+                <div class="text-center mb-10">
+
+                    <h2 class="text-2xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
+                        <!-- {{ $reviewSettings['title'] ?? 'Clients Feedbacks' }} -->
+                        Clients Feedbacks
+                    </h2>
+
+                    <p class="mt-2 text-sm leading-tight text-gray-500 max-w-xl mx-auto">
+                        <!-- {{ $reviewSettings['subtitle'] ?? 'Are you tired of the typical tourist destinations and looking to step out of your comfort zone travel' }} -->
+                        Are you tired of the typical tourist destinations and looking<br> to step out of your comfort zone travel
+                    </p>
+
+                </div>
+
+                {{-- Swiper --}}
+                <div class="relative reviewSwiper overflow-hidden">
+
+                    <div class="swiper-wrapper">
+
+                        @forelse($featuredReviews as $review)
+
+                            <div class="swiper-slide h-auto">
+
+                                <div class="bg-white rounded-[24px] border border-[#e5e5e5] p-8 relative h-full transition duration-500 hover:-translate-y-2 hover:shadow-xl">
+
+                                    {{-- Quote --}}
+                                    <div class="absolute top-7 right-7 opacity-20">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="w-14 h-14 text-gray-400"
+                                            fill="currentColor"
+                                            viewBox="0 0 24 24">
+
+                                            <path d="M7.17 6A5.001 5.001 0 002 11v7h7v-7H5.08A3.001 3.001 0 017.17 8H9V6H7.17zm10 0A5.001 5.001 0 0012 11v7h7v-7h-3.92A3.001 3.001 0 0117.17 8H19V6h-1.83z"/>
+
+                                        </svg>
+
+                                    </div>
+
+                                    {{-- User --}}
+                                    <div class="flex items-center gap-4 mb-7">
+
+                                        <div class="w-[65px] h-[65px] rounded-full overflow-hidden bg-gray-200 shrink-0">
+
+                                            @if(!empty($review->image))
+                                                <img
+                                                    src="{{ $review->image }}"
+                                                    alt="{{ $review->name }}"
+                                                    class="w-full h-full object-cover"
+                                                >
+                                            @else
+                                                <div class="w-full h-full flex items-center justify-center text-lg font-bold text-gray-700 bg-primary-100">
+                                                    {{ strtoupper(substr($review->name,0,1)) }}
+                                                </div>
+                                            @endif
+
+                                        </div>
+
+                                        <div>
+
+                                            <h4 class="text-[20px] font-bold leading-none text-black">
+                                                {{ $review->name }}
+                                            </h4>
+
+                                            <p class="mt-2 text-[16px] text-[#666] font-medium">
+                                                {{ $review->designation ?? 'CEO, Traveller' }}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    {{-- Review --}}
+                                    <p class="text-[15px] leading-[1.8] italic text-[#666] font-medium min-h-[100px]">
+
+                                        “ {{ $review->content }} ”
+
+                                    </p>
+
+                                    {{-- Stars --}}
+                                    <div class="flex items-center gap-1 mt-8">
+
+                                        @for($i = 1; $i <= 5; $i++)
+
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-5 h-5 {{ $i <= ($review->rating ?? 5) ? 'text-orange-400' : 'text-gray-300' }}"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921
+                                                1.902 0l1.07 3.292a1 1 0 00.95.69h3.462
+                                                c.969 0 1.371 1.24.588 1.81l-2.8
+                                                2.034a1 1 0 00-.364 1.118l1.07
+                                                3.292c.3.921-.755 1.688-1.54
+                                                1.118l-2.8-2.034a1 1 0
+                                                00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118
+                                                l1.07-3.292a1 1 0
+                                                00-.364-1.118L2.98
+                                                8.72c-.783-.57-.38-1.81.588-1.81h3.461a1
+                                                1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+
+                                        @endfor
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @empty
+
+                            @foreach([1,2,3,4] as $i)
+
+                                <div class="swiper-slide">
+
+                                    <div class="bg-white rounded-[24px] border border-[#e5e5e5] p-8 relative">
+
+                                        <div class="absolute top-7 right-7 opacity-20">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="w-14 h-14 text-gray-400"
+                                                fill="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path d="M7.17 6A5.001 5.001 0 002 11v7h7v-7H5.08A3.001 3.001 0 017.17 8H9V6H7.17zm10 0A5.001 5.001 0 0012 11v7h7v-7h-3.92A3.001 3.001 0 0117.17 8H19V6h-1.83z"/>
+                                            </svg>
+                                        </div>
+
+                                        <div class="flex items-center gap-4 mb-7">
+
+                                            <div class="w-[65px] h-[65px] rounded-full bg-pink-100"></div>
+
+                                            <div>
+                                                <h4 class="text-[24px] font-bold">
+                                                    Esther Howard
+                                                </h4>
+
+                                                <p class="text-[#666] mt-1">
+                                                    CEO, Traveller
+                                                </p>
+                                            </div>
+
+                                        </div>
+
+                                        <p class="text-[19px] leading-[1.8] italic text-[#666]">
+                                            “ Morem Ipsum Dolor Siter Amet Areaeey Consec Taetur Adipisc Service Ollwing Ipsum Dolor Consectetur. ”
+                                        </p>
+
+                                        <div class="flex gap-1 mt-8">
+                                            @for($x=1;$x<=5;$x++)
+                                                <svg class="w-5 h-5 text-orange-400"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921
+                                                    1.902 0l1.07 3.292a1 1 0 00.95.69h3.462
+                                                    c.969 0 1.371 1.24.588 1.81l-2.8
+                                                    2.034a1 1 0 00-.364 1.118l1.07
+                                                    3.292c.3.921-.755 1.688-1.54
+                                                    1.118l-2.8-2.034a1 1 0
+                                                    00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118
+                                                    l1.07-3.292a1 1 0
+                                                    00-.364-1.118L2.98
+                                                    8.72c-.783-.57-.38-1.81.588-1.81h3.461a1
+                                                    1 0 00.951-.69l1.07-3.292z"/>
+                                                </svg>
+                                            @endfor
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            @endforeach
+
+                        @endforelse
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
     @endif
 
     {{-- ==================== FAQ SECTION ==================== --}}
     @if($faqSection)
     @php $faqSettings = $faqSection->settings; $faqs = $faqSettings['faqs'] ?? []; @endphp
-    <section class="py-16 md:py-24 bg-gray-50">
+    <!-- <section class="py-16 md:py-24 bg-gray-50">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12 md:mb-16">
                 <p class="inline-block px-5 py-2 bg-primary-600 text-white text-sm font-bold rounded-full mb-5">{{ $faqSettings['badge_text'] ?? 'All Tasting Fees Are Included!' }}</p>
@@ -174,14 +911,14 @@
                 </a>
             </div>
         </div>
-    </section>
+    </section> -->
     @endif
 
     {{-- ==================== WHY CHOOSE US ==================== --}}
     @php $whySection = $enabledSections->firstWhere('key', 'why_choose_us'); @endphp
     @if($whySection)
     @php $whySettings = $whySection->settings; @endphp
-    <section class="py-16 md:py-24 bg-white">
+    <!-- <section class="py-16 md:py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12 md:mb-16">
                 <p class="text-sm font-semibold text-primary-600 uppercase tracking-widest mb-3">WHY</p>
@@ -230,75 +967,13 @@
                 @endforeach
             </div>
         </div>
-    </section>
-    @endif
-
-    {{-- ==================== REVIEWS SECTION ==================== --}}
-    @if($reviewsSection)
-    @php $reviewSettings = $reviewsSection->settings; @endphp
-    <section class="py-16 md:py-24 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12 md:mb-16">
-                <p class="text-sm font-semibold text-primary-600 uppercase tracking-widest mb-3">{{ $reviewSettings['badge'] ?? 'WHAT PEOPLE ARE SAYING' }}</p>
-                <h2 class="text-3xl md:text-5xl font-bold text-gray-900">{{ $reviewSettings['title'] ?? '5 Star Niagara Tours' }}</h2>
-                @if(!empty($reviewSettings['subtitle']))
-                    <p class="mt-4 text-lg text-gray-600">{{ $reviewSettings['subtitle'] }}</p>
-                @else
-                    <p class="mt-4 text-lg text-gray-600">Based on Over {{ \App\Models\Review::count() > 0 ? \App\Models\Review::count() . ' Reviews' : '2,000+ Reviews' }}</p>
-                @endif
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                @forelse($featuredReviews as $review)
-                    <div class="bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm hover:shadow-lg transition-shadow">
-                        <div class="flex items-center gap-1 mb-4">
-                            @for($i = 1; $i <= 5; $i++)
-                                <svg class="w-5 h-5 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-300' }} fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                            @endfor
-                        </div>
-                        <p class="text-gray-600 leading-relaxed mb-6 text-sm">&ldquo;{{ $review->content }}&rdquo;</p>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm">{{ substr($review->name, 0, 1) }}</div>
-                            <div>
-                                <p class="font-semibold text-gray-900 text-sm">{{ $review->name }}</p>
-                                @if($review->location)
-                                    <p class="text-xs text-gray-500">{{ $review->location }}</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    @foreach([
-                        ['name' => 'Sarah M.', 'location' => 'Toronto, ON', 'text' => 'Absolutely incredible experience! The tour guide was knowledgeable and friendly. The views of Niagara Falls were breathtaking. Highly recommend!'],
-                        ['name' => 'James K.', 'location' => 'New York, NY', 'text' => 'Booked the Niagara Wine Tour and it exceeded all expectations. The wineries were amazing, and the guide made the experience truly special.'],
-                        ['name' => 'Emily R.', 'location' => 'Chicago, IL', 'text' => 'The sunset tour was magical! Seeing the falls lit up at night was unforgettable. Professional service from start to finish. Worth every penny!'],
-                    ] as $review)
-                        <div class="bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-sm hover:shadow-lg transition-shadow">
-                            <div class="flex items-center gap-1 mb-4">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                @endfor
-                            </div>
-                            <p class="text-gray-600 leading-relaxed mb-6 text-sm">&ldquo;{{ $review['text'] }}&rdquo;</p>
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm">{{ substr($review['name'], 0, 1) }}</div>
-                                <div>
-                                    <p class="font-semibold text-gray-900 text-sm">{{ $review['name'] }}</p>
-                                    <p class="text-xs text-gray-500">{{ $review['location'] }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                @endforelse
-            </div>
-        </div>
-    </section>
+    </section> -->
     @endif
 
     {{-- ==================== NOW FEATURING (Promo) ==================== --}}
     @if($promoSection)
     @php $promoSettings = $promoSection->settings; @endphp
-    <section class="relative py-24 md:py-32 bg-cover bg-center" style="background-image: url('{{ $promoSettings['background_image'] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}');">
+    <!-- <section class="relative py-24 md:py-32 bg-cover bg-center" style="background-image: url('{{ $promoSettings['background_image'] ?? 'https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' }}');">
         <div class="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/75 to-gray-900/60"></div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-2xl">
@@ -317,53 +992,305 @@
                 </a>
             </div>
         </div>
-    </section>
+    </section> -->
     @endif
 
-    {{-- ==================== LATEST NEWS / BLOG ==================== --}}
-    @if($blogSection && $latestPosts->isNotEmpty())
-    @php $blogSettings = $blogSection->settings; @endphp
-    <section class="py-16 md:py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-12 md:mb-16">
-                <div>
-                    <p class="text-sm font-semibold text-primary-600 uppercase tracking-widest mb-3">{{ $blogSettings['badge'] ?? 'LATEST NEWS & TRENDS' }}</p>
-                    <h2 class="text-3xl md:text-5xl font-bold text-gray-900">{{ $blogSettings['title'] ?? 'From Our Blog' }}</h2>
+    {{-- ==================== BLOG / STORIES SLIDER ==================== --}}
+    @if($blogSection)
+        @php
+            $blogSettings = $blogSection->settings;
+        @endphp
+        <section class="py-10">
+
+            <div class="container-fluid mx-auto px-4">
+
+                {{-- Heading --}}
+                <div class="text-center">
+
+                    <h2 class="text-2xl md:text-4xl font-bold tracking-tight text-gray-900 leading-tight">
+                        {{ $blogSettings['title'] ?? 'Inspiration, guides, stories' }}
+                    </h2>
+
+                    <p class="mt-2 text-sm leading-tight text-gray-500 max-w-xl mx-auto">
+                        {{ $blogSettings['subtitle'] ?? 'NiagaraTours offers various blog resources that cater to travel enthusiasts, with a focus on adventure, gear reviews, and travel tips.' }}
+                    </p>
+
                 </div>
-                <a href="{{ $blogSettings['view_all_link'] ?? '#' }}" class="hidden sm:inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-500 transition-colors text-sm">
-                    View All
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </a>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                @foreach($latestPosts as $post)
-                    <div class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300">
-                        @if($post->featured_image)
-                            <div class="relative h-48 overflow-hidden">
-                                <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                {{-- Swiper --}}
+                <div class="relative blogSwiper overflow-hidden">
+
+                    <div class="swiper-wrapper">
+
+                        @forelse($latestPosts as $post)
+
+                            <div class="swiper-slide py-10">
+
+                                <article class="group relative h-full rounded-[24px] bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_20px_20px_rgba(15,23,42,0.08)] overflow-hidden transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_20px_20px_rgba(15,23,42,0.18)]">
+
+                                    {{-- Image --}}
+                                    <a href="#" class="block overflow-hidden">
+
+                                        <div class="relative h-[270px] overflow-hidden">
+
+                                            <img
+                                                src="{{ $post->featured_image ?? 'images/blog/1.jpg' }}"
+                                                alt="{{ $post->title }}"
+                                                class="w-full h-full object-cover transition duration-[1200ms] group-hover:scale-110"
+                                            >
+
+                                        </div>
+
+                                    </a>
+
+                                    {{-- Content --}}
+                                    <div class="p-4">
+
+                                        {{-- Meta --}}
+                                        <div class="flex items-center gap-3 text-[14px] text-[#666] font-medium">
+
+                                            <span>
+                                                {{ $post->published_at ? $post->published_at->format('F j, Y') : 'March 3, 2026' }}
+                                            </span>
+
+                                            <span class="w-[4px] h-[4px] rounded-full bg-[#888]"></span>
+
+                                            <span class="lowercase">
+                                                {{ $post->author ?? 'turie' }}
+                                            </span>
+
+                                        </div>
+
+                                        {{-- Title --}}
+                                        <h3 class="text-[18px] font-bold leading-snug text-gray-900 mt-4 tracking-tight">
+
+                                            <a href="#">
+                                                {{ $post->title ?? 'Experience global festivals and magical travel moments' }}
+                                            </a>
+
+                                        </h3>
+
+                                    </div>
+
+                                </article>
+
                             </div>
-                        @endif
-                        <div class="p-6">
-                            <p class="text-xs font-semibold text-primary-600 mb-2">{{ $post->author ?? 'Tour Guide Team' }} / {{ $post->date_formatted }}</p>
-                            <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors leading-tight">{{ $post->title }}</h3>
-                            <p class="text-sm text-gray-500 leading-relaxed">{{ $post->excerpt_html }}</p>
-                            <a href="#" class="inline-flex items-center gap-1 mt-4 text-primary-600 font-semibold hover:text-primary-500 transition-colors text-sm">
-                                Read More
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                            </a>
-                        </div>
+
+                        @empty
+
+                            @foreach([
+
+                                [
+                                    'image' => 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=1200&auto=format&fit=crop',
+                                    'title' => 'Experience global festivals and magical travel moments'
+                                ],
+
+                                [
+                                    'image' => 'https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?q=80&w=1200&auto=format&fit=crop',
+                                    'title' => 'Travel to exotic destinations and vibrant city festivals'
+                                ],
+
+                                [
+                                    'image' => 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop',
+                                    'title' => 'Journey through historic landmarks and festive streets'
+                                ],
+
+                                [
+                                    'image' => 'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?q=80&w=1200&auto=format&fit=crop',
+                                    'title' => 'Explore ancient cities and lively cultural celebrations'
+                                ],
+
+                            ] as $item)
+
+                                <div class="swiper-slide">
+
+                                    <article class="group">
+
+                                        {{-- Image --}}
+                                        <a href="#" class="block overflow-hidden rounded-[24px]">
+
+                                            <div class="relative h-[270px] overflow-hidden rounded-[24px]">
+
+                                                <img
+                                                    src="{{ $item['image'] }}"
+                                                    alt="{{ $item['title'] }}"
+                                                    class="w-full h-full object-cover transition duration-[1200ms] group-hover:scale-110"
+                                                >
+
+                                            </div>
+
+                                        </a>
+
+                                        {{-- Content --}}
+                                        <div class="pt-5">
+
+                                            {{-- Meta --}}
+                                            <div class="flex items-center gap-3 text-[14px] text-[#666] font-medium">
+
+                                                <span>
+                                                    March 3, 2026
+                                                </span>
+
+                                                <span class="w-[4px] h-[4px] rounded-full bg-[#888]"></span>
+
+                                                <span class="lowercase">
+                                                    turie
+                                                </span>
+
+                                            </div>
+
+                                            {{-- Title --}}
+                                            <h3 class="mt-4 text-[24px] leading-[1.35] font-semibold text-black tracking-tight transition duration-300 group-hover:text-primary-600">
+
+                                                <a href="#">
+                                                    {{ $item['title'] }}
+                                                </a>
+
+                                            </h3>
+
+                                        </div>
+
+                                    </article>
+
+                                </div>
+
+                            @endforeach
+
+                        @endforelse
+
                     </div>
-                @endforeach
+
+                </div>
+
             </div>
 
-            <div class="text-center mt-10 sm:hidden">
-                <a href="{{ $blogSettings['view_all_link'] ?? '#' }}" class="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-500 transition-colors text-sm">
-                    View All
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </a>
-            </div>
-        </div>
-    </section>
+        </section>
     @endif
 @endsection
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const el = document.querySelector(".destinationSwiper");
+
+    if (!el) return;
+
+    new Swiper(".destinationSwiper", {
+        loop: true,
+        spaceBetween: 20,
+        slidesPerView: 1,
+
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
+
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+
+        breakpoints: {
+            640: { slidesPerView: 1.2 },
+            768: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
+            1280: { slidesPerView: 4 },
+        }
+    });
+
+});
+</script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const reviewEl = document.querySelector(".reviewSwiper");
+
+    if (!reviewEl) return;
+
+    new Swiper(".reviewSwiper", {
+
+        loop: true,
+
+        spaceBetween: 25,
+
+        grabCursor: true,
+
+        centeredSlides: false,
+
+        autoplay: {
+            delay: 2500,
+            disableOnInteraction: false,
+        },
+
+        speed: 900,
+
+        breakpoints: {
+
+            0: {
+                slidesPerView: 1,
+            },
+
+            768: {
+                slidesPerView: 2,
+            },
+
+            1200: {
+                slidesPerView: 3,
+            }
+
+        }
+
+    });
+
+});
+</script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const blogEl = document.querySelector(".blogSwiper");
+
+    if (!blogEl) return;
+
+    new Swiper(".blogSwiper", {
+
+        loop: true,
+
+        spaceBetween: 28,
+
+        speed: 900,
+
+        grabCursor: true,
+
+        autoplay: {
+            delay: 2800,
+            disableOnInteraction: false,
+        },
+
+        breakpoints: {
+
+            0: {
+                slidesPerView: 1,
+            },
+
+            640: {
+                slidesPerView: 1.2,
+            },
+
+            768: {
+                slidesPerView: 2,
+            },
+
+            1200: {
+                slidesPerView: 4,
+            }
+
+        }
+
+    });
+
+});
+</script>
