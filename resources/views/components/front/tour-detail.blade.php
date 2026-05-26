@@ -514,7 +514,7 @@
         {{-- Tour Info Header --}}
         <section class="py-10">
             <div class="container-fluid mx-auto px-4">
-                <div class="flex flex-col lg:flex-row gap-8">
+                <div class="flex flex-col-reverse lg:flex-row gap-8">
                     {{-- Left Column --}}
                     <div class="lg:w-2/3">
 
@@ -993,10 +993,6 @@
                                         </span>
 
                                     </div>
-
-                                    <p class="text-sm text-gray-500 mt-1">
-                                       Plan your journey
-                                    </p>
 
                                     {{-- PRICE --}}
                                     <div class="mt-5">
