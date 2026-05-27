@@ -3,57 +3,210 @@
 @section('title', 'About Us')
 
 @section('content')
-    <!-- Page Header -->
-    <section class="bg-gray-50 border-b border-gray-200">
-        <x-breadcrumbs :items="[
-            ['label' => 'About Us'],
-        ]" />
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 text-center">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">About Niagara Tours</h1>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Creating unforgettable Niagara Falls experiences since 2010. We are passionate about sharing the wonder of one of the world's greatest natural treasures.</p>
+
+    {{-- =========================
+        TOP HERO SECTION
+    ========================== --}}
+    <section>
+        <div class="bg-[#F8FAFB] border-t border-b border-gray-200">
+
+            <div class="container-fluid mx-auto px-4 py-10">
+
+                {{-- Breadcrumb --}}
+                <div class="flex items-center gap-2 text-sm text-gray-500 mb-8">
+
+                    <a href="{{ route('home') }}"
+                    class="hover:text-primary-600 transition">
+                        Home
+                    </a>
+
+                    <svg class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"/>
+                    </svg>
+
+                    <span class="text-gray-700 truncate">
+                        About Us
+                    </span>
+
+                </div>
+
+                {{-- Title --}}
+                <h1 class="text-4xl lg:text-5xl font-bold text-black leading-tight w-full">
+                    About Niagara Tours
+                </h1>
+                <p class="mt-2 text-gray-600">Creating unforgettable Niagara Falls experiences since 2010. We are passionate about sharing the wonder of one of the world's greatest natural treasures.</p>
+            </div>
         </div>
     </section>
 
     <!-- Our Story -->
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
-                <div>
-                    <img src="https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Niagara Falls" class="rounded-xl shadow-lg w-full h-80 object-cover">
-                </div>
-                <div class="mt-8 lg:mt-0">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Our Story</h2>
-                    <div class="space-y-4 text-gray-600 leading-relaxed">
-                        <p>Founded in 2010, Niagara Tours was born out of a deep love for the natural wonder that is Niagara Falls. What started as a small family-run operation has grown into one of the region's most trusted tour providers.</p>
-                        <p>Over the years, we have welcomed hundreds of thousands of guests from around the world, offering them an authentic and unforgettable experience of the falls and the surrounding region.</p>
-                        <p>Our team of experienced guides, customer service professionals, and operations staff work tirelessly to ensure every tour is safe, enjoyable, and memorable. We pride ourselves on our attention to detail, our commitment to sustainability, and our passion for sharing the beauty of Niagara with every guest.</p>
+    <section class="py-16">
+        <div class="container-fluid mx-auto px-4">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                <!-- LEFT IMAGES -->
+                <div class="relative">
+
+                    <!-- Background Shape -->
+                    <div class="absolute inset-0 flex items-center justify-center opacity-10">
+                        <img
+                            src="https://cdn-icons-png.flaticon.com/512/854/854878.png"
+                            class="w-72"
+                            alt=""
+                        >
                     </div>
+
+                    <div class="grid grid-cols-2 gap-6 relative z-10">
+
+                        <!-- Image 1 -->
+                        <div class="space-y-6">
+
+                            <img
+                                src="images/banners/about-banner-1.jpg"
+                                alt="Travel"
+                                class="rounded-[24px] w-full h-[150px] md:h-64 object-cover shadow-lg"
+                            >
+
+                            <img
+                                src="images/banners/about-banner-2.jpg"
+                                alt="Travel"
+                                class="rounded-[24px] w-full h-[150px] md:h-80 object-cover shadow-lg"
+                            >
+                        </div>
+
+                        <!-- Image 2 -->
+                        <div class="pt-20">
+
+                            <!-- Circle Badge -->
+                            <div class="absolute top-0 left-[75%] md:left-[85%] -translate-x-1/2 z-20">
+                                <div class="w-40 h-40 rounded-full bg-white shadow-xl border border-gray-100 flex items-center justify-center">
+
+                                    <div class="text-center">
+
+                                        <!-- Award Icon -->
+                                        <div class="w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center mx-auto mb-3">
+
+                                            <img
+                                                src="images/icons/icon-4.png"
+                                                alt="Travel"
+                                                class="object-cover"
+                                            >
+
+                                        </div>
+
+                                        <p class="text-xs uppercase tracking-[4px] text-gray-500 font-semibold">
+                                            Since 2010
+                                        </p>
+
+                                        <h4 class="text-sm font-bold text-gray-900 mt-1">
+                                            Niagara Tours
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <img
+                                src="images/banners/about-banner-3.jpg"
+                                alt="Travel"
+                                class="rounded-[24px] w-full h-[250px] md:h-[520px] object-cover shadow-lg"
+                            >
+                        </div>
+
+                    </div>
+
                 </div>
+
+                <!-- RIGHT CONTENT -->
+                <div>
+
+                    <p class="text-sm uppercase tracking-[3px] text-red-600 font-semibold mb-4">
+                        Explore The World With Us
+                    </p>
+
+                    <h2 class="text-xl lg:text-4xl font-bold text-gray-900 leading-tight mb-7">
+                        Experience the Beauty of<br> Niagara With Experts
+                    </h2>
+
+                    <p class="text-gray-600 text-base leading-normal mb-10">
+                        Founded in 2010, Niagara Tours was born out of a deep love for the natural wonder that is Niagara Falls. What started as a small family-run operation has grown into one of the region's most trusted tour providers.<br><br>
+
+                        Over the years, we have welcomed hundreds of thousands of guests from around the world, offering them an authentic and unforgettable experience of the falls and the surrounding region.<br><br>
+
+                        Our team of experienced guides, customer service professionals, and operations staff work tirelessly to ensure every tour is safe, enjoyable, and memorable. We pride ourselves on our attention to detail, our commitment to sustainability, and our passion for sharing the beauty of Niagara with every guest.
+                    </p>
+
+                </div>
+
             </div>
+
         </div>
     </section>
 
     <!-- Stats -->
     <section class="py-16 bg-primary-600">
         <div class="max-w-7xl mx-auto px-4">
+
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+
+                <!-- Item -->
                 <div class="text-center">
-                    <p class="text-4xl font-bold text-white">15,000+</p>
-                    <p class="text-primary-200 mt-2 text-sm font-medium">Tours Completed</p>
+                    <h3 class="text-4xl font-bold text-white counter"
+                        data-target="15000">
+                        0
+                    </h3>
+
+                    <p class="text-primary-200 mt-2 text-sm font-medium">
+                        Tours Completed
+                    </p>
                 </div>
+
+                <!-- Item -->
                 <div class="text-center">
-                    <p class="text-4xl font-bold text-white">50,000+</p>
-                    <p class="text-primary-200 mt-2 text-sm font-medium">Happy Customers</p>
+                    <h3 class="text-4xl font-bold text-white counter"
+                        data-target="50000">
+                        0
+                    </h3>
+
+                    <p class="text-primary-200 mt-2 text-sm font-medium">
+                        Happy Customers
+                    </p>
                 </div>
+
+                <!-- Item -->
                 <div class="text-center">
-                    <p class="text-4xl font-bold text-white">15+</p>
-                    <p class="text-primary-200 mt-2 text-sm font-medium">Years in Business</p>
+                    <h3 class="text-4xl font-bold text-white counter"
+                        data-target="15">
+                        0
+                    </h3>
+
+                    <p class="text-primary-200 mt-2 text-sm font-medium">
+                        Years in Business
+                    </p>
                 </div>
+
+                <!-- Item -->
                 <div class="text-center">
-                    <p class="text-4xl font-bold text-white">12</p>
-                    <p class="text-primary-200 mt-2 text-sm font-medium">Industry Awards</p>
+                    <h3 class="text-4xl font-bold text-white counter"
+                        data-target="12">
+                        0
+                    </h3>
+
+                    <p class="text-primary-200 mt-2 text-sm font-medium">
+                        Industry Awards
+                    </p>
                 </div>
+
             </div>
+
         </div>
     </section>
 
@@ -91,7 +244,7 @@
     </section>
 
     <!-- Team -->
-    <section class="py-16 bg-white">
+    <!-- <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-900">Meet Our Team</h2>
@@ -128,10 +281,10 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Call to Action -->
-    <section class="py-16 bg-gray-50">
+    <section class="py-16">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to Experience Niagara Falls?</h2>
             <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Join thousands of satisfied travelers and book your adventure today.</p>
@@ -141,4 +294,60 @@
             </a>
         </div>
     </section>
+
+<!-- Counter Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const counters = document.querySelectorAll('.counter');
+
+        const animateCounter = (counter) => {
+
+            const target = +counter.getAttribute('data-target');
+            let count = 0;
+
+            const increment = target / 100;
+
+            const updateCounter = () => {
+
+                count += increment;
+
+                if (count < target) {
+
+                    counter.innerText = Math.ceil(count).toLocaleString();
+
+                    requestAnimationFrame(updateCounter);
+
+                } else {
+
+                    counter.innerText = target.toLocaleString() + '+';
+                }
+            };
+
+            updateCounter();
+        };
+
+        // Intersection Observer
+        const observer = new IntersectionObserver((entries) => {
+
+            entries.forEach(entry => {
+
+                if (entry.isIntersecting) {
+
+                    animateCounter(entry.target);
+
+                    observer.unobserve(entry.target);
+                }
+            });
+
+        }, {
+            threshold: 0.5
+        });
+
+        counters.forEach(counter => {
+            observer.observe(counter);
+        });
+
+    });
+</script>
 @endsection
