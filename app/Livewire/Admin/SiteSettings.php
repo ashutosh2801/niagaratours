@@ -26,6 +26,7 @@ class SiteSettings extends Component
     public $social_youtube;
     public $logo;
     public $favicon;
+    public $og_image;
     public $storage_disk;
     public $aws_key;
     public $aws_secret;
@@ -46,6 +47,8 @@ class SiteSettings extends Component
             $this->logo = $url;
         } elseif ($target === 'favicon') {
             $this->favicon = $url;
+        } elseif ($target === 'og_image') {
+            $this->og_image = $url;
         }
     }
 
@@ -61,7 +64,7 @@ class SiteSettings extends Component
             'meta_title', 'meta_description', 'meta_keywords',
             'contact_email', 'contact_phone', 'contact_address',
             'social_facebook', 'social_twitter', 'social_instagram', 'social_youtube',
-            'logo', 'favicon',
+            'logo', 'favicon', 'og_image',
             'storage_disk', 'aws_key', 'aws_secret', 'aws_region', 'aws_bucket',
             'stripe_key', 'stripe_secret',
         ];
@@ -93,6 +96,7 @@ class SiteSettings extends Component
             'social_youtube' => $this->social_youtube,
             'logo' => $this->logo,
             'favicon' => $this->favicon,
+            'og_image' => $this->og_image,
             'storage_disk' => $this->storage_disk,
             'aws_key' => $this->aws_key,
             'aws_secret' => $this->aws_secret,

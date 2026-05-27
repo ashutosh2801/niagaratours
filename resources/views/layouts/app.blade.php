@@ -28,13 +28,13 @@
     <meta property="og:title" content="@yield('og_title', $metaTitle)">
     <meta property="og:description" content="@yield('og_description', $metaDescription)">
     <meta property="og:url" content="@yield('og_url', url()->current())">
-    <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+    <meta property="og:image" content="@yield('og_image', App\Models\Setting::get('og_image', asset('images/og-default.jpg')))">
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('og_title', $metaTitle)">
     <meta name="twitter:description" content="@yield('og_description', $metaDescription)">
-    <meta name="twitter:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+    <meta name="twitter:image" content="@yield('og_image', App\Models\Setting::get('og_image', asset('images/og-default.jpg')))">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 

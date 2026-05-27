@@ -73,6 +73,25 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
                     <input type="text" wire:model="meta_keywords" placeholder="tour, niagara, travel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Social Share Image (OG Image)</label>
+                    <p class="text-xs text-gray-500 mb-2">This image appears when your website link is shared on social media (Facebook, WhatsApp, Twitter, etc.). Recommended size: 1200×630px.</p>
+                    <div class="flex items-center gap-3">
+                        <button type="button" x-data @click="$wire.openMediaPickerFor('og_image').then(() => $dispatch('openMediaPicker'))" class="px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100">
+                            Choose from Media Library
+                        </button>
+                        @if($og_image)
+                            <button type="button" wire:click="$set('og_image', '')" class="text-xs text-red-600 hover:text-red-700">Remove</button>
+                        @endif
+                    </div>
+                    @if($og_image)
+                        <img src="{{ $og_image }}" class="mt-2 h-24 object-contain border border-gray-200 rounded-lg">
+                    @else
+                        <div class="mt-2 flex items-center justify-center h-24 bg-gray-100 border border-dashed border-gray-300 rounded-lg text-xs text-gray-400">
+                            No image set — default OG image will be used
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
 
