@@ -21,6 +21,7 @@ use App\Livewire\Admin\DestinationForm;
 
 Route::view('/', 'welcome')->name('home');
 Route::get('/tours', App\Livewire\Front\TourList::class)->name('tours');
+Route::get('/tours/destination/{slug}', App\Livewire\Front\DestinationTours::class)->name('tours.by_destination');
 Route::get('/destinations', App\Livewire\Front\DestinationList::class)->name('destinations');
 Route::get('/tour/{slug}', TourDetail::class)->name('tour.detail');
 Route::get('/booking/{tour_id}', BookingForm::class)->name('booking');

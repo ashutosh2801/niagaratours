@@ -173,7 +173,7 @@
                                 @foreach($destinations as $destination)
                                     <div class="swiper-slide">
                                         <div class="relative h-[450px] rounded-[22px] overflow-hidden group">
-                                            <a href="{{ route('tour.detail', $destination->slug) }}">
+                                            <a href="{{ route('tours.by_destination', $destination->slug) }}">
                                                 <img src="{{ $destination->image ?? '' }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                                                 <div class="absolute bottom-8 text-center w-full">

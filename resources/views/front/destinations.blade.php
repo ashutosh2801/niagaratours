@@ -57,7 +57,7 @@
                                     <p class="text-white/70 text-sm mt-2">{{ $destination->tours_count }} tours</p>
                                 @endif
                             </div>
-                            <a href="{{ route('tour.detail', $destination->slug) }}" wire:navigate class="absolute inset-0"></a>
+                            <a href="{{ route('tours.by_destination', $destination->slug) }}" wire:navigate class="absolute inset-0"></a>
                         </div>
                     @endforeach
                 </div>

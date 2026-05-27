@@ -5,7 +5,7 @@
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
+        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6" style="--color-accent: #d52b1e; --color-accent-content: #b5251a; --color-accent-foreground: #fff;">
             @csrf
 
             <!-- Email Address -->
