@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use Illuminate\Support\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -15,21 +16,42 @@ class NotificationList extends Component
     use WithPagination;
 
     public $filter = 'all';
+    public $selectedNotificationId = null;
+
+    public function viewNotification($id)
+    {
+        $this->selectedNotificationId = (int) $id;
+    }
+
+    public function closeNotificationView()
+    {
+        $this->selectedNotificationId = null;
+    }
 
     public function markAsRead($id)
     {
         $notification = TourNotification::findOrFail($id);
-        $notification->update(['is_read' => true]);
+        $notification->update([
+            'is_read' => true,
+            'read_at' => Carbon::now(),
+        ]);
     }
 
     public function markAllAsRead()
     {
-        TourNotification::where('is_read', false)->update(['is_read' => true]);
+        TourNotification::where('is_read', false)->update([
+            'is_read' => true,
+            'read_at' => Carbon::now(),
+        ]);
     }
 
     public function delete($id)
     {
         TourNotification::findOrFail($id)->delete();
+
+        if ($this->selectedNotificationId === (int) $id) {
+            $this->selectedNotificationId = null;
+        }
     }
 
     public function render()
@@ -44,6 +66,10 @@ class NotificationList extends Component
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('components.admin.notification-list', compact('notifications'));
+        $selectedNotification = $this->selectedNotificationId
+            ? TourNotification::find($this->selectedNotificationId)
+            : null;
+
+        return view('components.admin.notification-list', compact('notifications', 'selectedNotification'));
     }
 }

@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->text('message');
-            $table->string('icon')->nullable();
-            $table->string('color')->nullable();
-            $table->string('url')->nullable();
+            $table->string('name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('subject')->nullable();
+            $table->text('message')->nullable();
             $table->boolean('is_read')->default(false);
             $table->timestamp('read_at')->nullable();
             $table->timestamps();

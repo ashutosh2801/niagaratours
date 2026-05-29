@@ -10,10 +10,11 @@ class TourNotification extends Model
 
     protected $fillable = [
         'type',
+        'name',
+        'email',
+        'subject',
         'message',
-        'icon',
-        'color',
-        'url',
+        'message',
         'is_read',
         'read_at',
     ];
