@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Media;
 use App\Models\Setting;
+use App\Helpers\ActivityLogger;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
@@ -80,7 +81,9 @@ class MediaPicker extends Component
             ]);
         }
 
+        $count = count($this->uploads);
         $this->uploads = [];
+        ActivityLogger::log('created', 'Media', "{$count} file(s) uploaded via picker");
     }
 
     public function render()

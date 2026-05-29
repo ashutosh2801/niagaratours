@@ -209,7 +209,7 @@ class TourForm extends Component
             'destination_id' => 'nullable|exists:destinations,id',
             'location' => 'nullable|string|max:255',
             'duration' => 'nullable|integer|min:1',
-            'duration_type' => 'required|in:hours,days',
+            'duration_type' => 'required|in:minutes,hours,days,weeks',
             'max_people' => 'nullable|integer|min:1',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',

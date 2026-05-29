@@ -11,11 +11,27 @@
         </a>
     </div>
 
+    @if(session('message'))
+        <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">{{ session('message') }}</div>
+    @endif
+
+    @if(!empty($selectedIds))
+        <div class="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+            <span class="text-sm text-blue-700">{{ count($selectedIds) }} tour(s) selected</span>
+            <button wire:click="deleteSelected" wire:confirm="Delete {{ count($selectedIds) }} selected tour(s)?" class="px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
+                Delete Selected
+            </button>
+        </div>
+    @endif
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                        <th class="px-6 py-3 w-12">
+                            <input type="checkbox" wire:click="toggleSelectAll" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        </th>
                         <th class="px-6 py-3 w-16">Image</th>
                         <th class="px-6 py-3">Title</th>
                         <th class="px-6 py-3">Category</th>
@@ -28,7 +44,10 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse($tours ?? [] as $tour)
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 {{ in_array($tour->id, $selectedIds) ? 'bg-blue-50' : '' }}">
+                            <td class="px-6 py-4">
+                                <input type="checkbox" wire:model.live="selectedIds" value="{{ $tour->id }}" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                            </td>
                             <td class="px-6 py-4">
                                 @php $img = $tour->featured_image ?? ($tour->images[0] ?? null); @endphp
                                 @if($img)
@@ -52,11 +71,10 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4">
-                                @if($tour->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
-                                @endif
+                                <button wire:click="toggleActive({{ $tour->id }})" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-0 cursor-pointer transition-colors
+                                    {{ $tour->is_active ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-red-100 text-red-800 hover:bg-red-200' }}">
+                                    {{ $tour->is_active ? 'Active' : 'Inactive' }}
+                                </button>
                             </td>
                             <td class="px-6 py-4">
                                 @if($tour->is_featured)
@@ -70,6 +88,9 @@
                                     <a href="{{ route('admin.tours.edit', $tour) }}" wire:navigate class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Edit">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </a>
+                                    <button wire:click="clone({{ $tour->id }})" class="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Clone">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    </button>
                                     <button wire:click="delete({{ $tour->id }})" wire:confirm="Are you sure you want to delete this tour?" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
@@ -78,7 +99,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
+                            <td colspan="9" class="px-6 py-12 text-center">
                                 <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <p class="text-gray-500 font-medium">No tours found</p>
                                 <p class="text-gray-400 text-sm mt-1">Get started by creating your first tour.</p>

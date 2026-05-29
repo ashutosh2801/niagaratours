@@ -8,6 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\TourNotification;
+use App\Helpers\ActivityLogger;
 
 #[Title('Notifications')]
 #[Layout('layouts.admin')]
@@ -39,6 +40,7 @@ class NotificationList extends Component
             'is_read' => true,
             'read_at' => Carbon::now(),
         ]);
+        ActivityLogger::log('updated', 'Notification', "Notification #{$id} marked as read");
     }
 
     public function markAllAsRead()
@@ -47,10 +49,12 @@ class NotificationList extends Component
             abort(403, 'Unauthorized access.');
         }
 
+        $count = TourNotification::where('is_read', false)->count();
         TourNotification::where('is_read', false)->update([
             'is_read' => true,
             'read_at' => Carbon::now(),
         ]);
+        ActivityLogger::log('updated', 'Notification', "{$count} notification(s) marked as read");
     }
 
     public function delete($id)
@@ -60,6 +64,7 @@ class NotificationList extends Component
         }
 
         TourNotification::findOrFail($id)->delete();
+        ActivityLogger::log('deleted', 'Notification', "Notification #{$id} deleted");
 
         if ($this->selectedNotificationId === (int) $id) {
             $this->selectedNotificationId = null;

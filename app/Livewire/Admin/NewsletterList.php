@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\NewsletterSubscription;
+use App\Helpers\ActivityLogger;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -20,7 +21,10 @@ class NewsletterList extends Component
             abort(403, 'Unauthorized access.');
         }
 
-        NewsletterSubscription::findOrFail($id)->delete();
+        $subscriber = NewsletterSubscription::findOrFail($id);
+        $email = $subscriber->email;
+        $subscriber->delete();
+        ActivityLogger::log('deleted', 'Newsletter', "Subscriber '{$email}' deleted");
     }
 
     public function render()

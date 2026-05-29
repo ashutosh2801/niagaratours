@@ -17,6 +17,26 @@ class UserList extends Component
 
     public $search = '';
 
+    public function toggleActive($id)
+    {
+        if (!auth()->user()->hasPermission('users')) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $user = User::findOrFail($id);
+        if ($user->hasRole('administrator')) {
+            session()->flash('error', 'Cannot deactivate an Administrator user.');
+            return;
+        }
+        if ($user->id === auth()->id()) {
+            session()->flash('error', 'You cannot deactivate your own account.');
+            return;
+        }
+        $user->update(['is_active' => !$user->is_active]);
+        $status = $user->is_active ? 'activated' : 'deactivated';
+        ActivityLogger::log('updated', 'User', "User '{$user->name}' {$status}");
+    }
+
     public function deleteUser($id)
     {
         if (!auth()->user()->hasPermission('users')) {

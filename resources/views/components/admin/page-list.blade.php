@@ -11,11 +11,27 @@
         </a>
     </div>
 
+    @if(session('message'))
+        <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">{{ session('message') }}</div>
+    @endif
+
+    @if(!empty($selectedIds))
+        <div class="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+            <span class="text-sm text-blue-700">{{ count($selectedIds) }} page(s) selected</span>
+            <button wire:click="deleteSelected" wire:confirm="Delete {{ count($selectedIds) }} selected page(s)?" class="px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
+                Delete Selected
+            </button>
+        </div>
+    @endif
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                        <th class="px-6 py-3 w-12">
+                            <input type="checkbox" wire:click="toggleSelectAll" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        </th>
                         <th class="px-6 py-3">Title</th>
                         <th class="px-6 py-3">Slug</th>
                         <th class="px-6 py-3">Status</th>
@@ -25,9 +41,12 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse($pages ?? [] as $page)
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 {{ in_array($page->id, $selectedIds) ? 'bg-blue-50' : '' }}">
                             <td class="px-6 py-4">
-                                <a href="{{ route('admin.pages.edit', $page) }}" wire:navigate class="font-medium text-gray-900 hover:text-primary-600">{{ $page->title }}</a>
+                                <input type="checkbox" wire:model.live="selectedIds" value="{{ $page->id }}" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                            </td>
+                            <td class="px-6 py-4">
+                                <a href="{{ route('admin.pages.edit', ['pageId' => $page->id]) }}" wire:navigate class="font-medium text-gray-900 hover:text-primary-600">{{ $page->title }}</a>
                             </td>
                             <td class="px-6 py-4 text-gray-500">{{ $page->slug }}</td>
                             <td class="px-6 py-4">
@@ -51,7 +70,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
                                 <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 <p class="text-gray-500 font-medium">No pages found</p>
                                 <a href="{{ route('admin.pages.create') }}" wire:navigate class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">Add New Page</a>

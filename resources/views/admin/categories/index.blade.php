@@ -15,11 +15,23 @@
         <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">{{ session('message') }}</div>
     @endif
 
+    @if(!empty($selectedIds))
+        <div class="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+            <span class="text-sm text-blue-700">{{ count($selectedIds) }} category(ies) selected</span>
+            <button wire:click="deleteSelected" wire:confirm="Delete {{ count($selectedIds) }} selected category(ies)?" class="px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
+                Delete Selected
+            </button>
+        </div>
+    @endif
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                        <th class="px-6 py-3 w-12">
+                            <input type="checkbox" wire:click="toggleSelectAll" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        </th>
                         <th class="px-6 py-3 w-16">Image</th>
                         <th class="px-6 py-3">Name</th>
                         <th class="px-6 py-3">Slug</th>
@@ -31,7 +43,10 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse($categories ?? [] as $category)
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 {{ in_array($category->id, $selectedIds) ? 'bg-blue-50' : '' }}">
+                            <td class="px-6 py-4">
+                                <input type="checkbox" wire:model.live="selectedIds" value="{{ $category->id }}" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                            </td>
                             <td class="px-6 py-4">
                                 @if($category->image)
                                     <img src="{{ $category->image }}" alt="{{ $category->name }}" class="w-12 h-12 object-cover rounded-lg border border-gray-200">
@@ -48,11 +63,10 @@
                             <td class="px-6 py-4 text-gray-700">{{ $category->sort_order ?? 0 }}</td>
                             <td class="px-6 py-4 text-gray-700">{{ $category->tours->count() }}</td>
                             <td class="px-6 py-4">
-                                @if($category->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>
-                                @endif
+                                <button wire:click="toggleActive({{ $category->id }})" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-0 cursor-pointer transition-colors
+                                    {{ $category->is_active ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-red-100 text-red-800 hover:bg-red-200' }}">
+                                    {{ $category->is_active ? 'Active' : 'Inactive' }}
+                                </button>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">
@@ -67,7 +81,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="8" class="px-6 py-12 text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                                 <p class="text-sm">No categories found.</p>
                                 <a href="{{ route('admin.categories.create') }}" wire:navigate class="mt-2 inline-flex items-center text-sm text-primary-600 hover:text-primary-700">Create your first category</a>

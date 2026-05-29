@@ -17,6 +17,7 @@ class DestinationList extends Component
 
     public $search = '';
     public $popular = false;
+    public $selectedIds = [];
 
     public function mount()
     {
@@ -32,11 +33,51 @@ class DestinationList extends Component
         $destination = Destination::findOrFail($id);
         $name = $destination->name;
         $destination->delete();
+        $this->selectedIds = array_diff($this->selectedIds, [$id]);
         session()->flash('message', 'Destination deleted successfully.');
         ActivityLogger::log('deleted', 'Destination', "Destination '{$name}' deleted");
     }
 
-    public function render()
+    public function deleteSelected()
+    {
+        if (!auth()->user()->hasPermission('destinations')) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $destinations = Destination::whereIn('id', $this->selectedIds)->get();
+        foreach ($destinations as $destination) {
+            $destination->delete();
+            ActivityLogger::log('deleted', 'Destination', "Destination '{$destination->name}' deleted");
+        }
+
+        $count = count($this->selectedIds);
+        $this->selectedIds = [];
+        session()->flash('message', "{$count} destination(s) deleted successfully.");
+    }
+
+    public function toggleActive($id)
+    {
+        if (!auth()->user()->hasPermission('destinations')) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $destination = Destination::findOrFail($id);
+        $destination->update(['is_active' => !$destination->is_active]);
+        $status = $destination->is_active ? 'activated' : 'deactivated';
+        ActivityLogger::log('updated', 'Destination', "Destination '{$destination->name}' {$status}");
+    }
+
+    public function toggleSelectAll()
+    {
+        $ids = $this->query()->pluck('id')->toArray();
+        if (empty(array_diff($ids, $this->selectedIds))) {
+            $this->selectedIds = array_values(array_diff($this->selectedIds, $ids));
+        } else {
+            $this->selectedIds = array_values(array_unique(array_merge($this->selectedIds, $ids)));
+        }
+    }
+
+    private function query()
     {
         $query = Destination::where('name', 'like', '%'.$this->search.'%');
 
@@ -44,8 +85,13 @@ class DestinationList extends Component
             $query->where('is_popular', true);
         }
 
-        $destinations = $query->orderBy('sort_order')->orderBy('name')->paginate(10);
+        return $query->orderBy('sort_order')->orderBy('name');
+    }
 
-        return view('admin.destinations.index', compact('destinations'));
+    public function render()
+    {
+        return view('admin.destinations.index', [
+            'destinations' => $this->query()->paginate(10),
+        ]);
     }
 }

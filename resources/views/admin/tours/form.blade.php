@@ -91,6 +91,7 @@
                         <label for="duration_type" class="block text-sm font-medium text-gray-700 mb-1">Duration Type</label>
                         <select id="duration_type" wire:model="duration_type"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="minutes">Minutes</option>
                             <option value="hours">Hours</option>
                             <option value="days">Days</option>
                             <option value="weeks">Weeks</option>

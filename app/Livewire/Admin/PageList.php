@@ -16,6 +16,7 @@ class PageList extends Component
     use WithPagination;
 
     public $search = '';
+    public $selectedIds = [];
 
     public function delete($id)
     {
@@ -26,16 +27,48 @@ class PageList extends Component
         $page = Page::findOrFail($id);
         $title = $page->title;
         $page->delete();
+        $this->selectedIds = array_diff($this->selectedIds, [$id]);
         session()->flash('message', 'Page deleted successfully.');
         ActivityLogger::log('deleted', 'Page', "Page '{$title}' deleted");
     }
 
+    public function deleteSelected()
+    {
+        if (!auth()->user()->hasPermission('pages')) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $pages = Page::whereIn('id', $this->selectedIds)->get();
+        foreach ($pages as $page) {
+            $page->delete();
+            ActivityLogger::log('deleted', 'Page', "Page '{$page->title}' deleted");
+        }
+
+        $count = count($this->selectedIds);
+        $this->selectedIds = [];
+        session()->flash('message', "{$count} page(s) deleted successfully.");
+    }
+
+    public function toggleSelectAll()
+    {
+        $ids = $this->query()->pluck('id')->toArray();
+        if (empty(array_diff($ids, $this->selectedIds))) {
+            $this->selectedIds = array_values(array_diff($this->selectedIds, $ids));
+        } else {
+            $this->selectedIds = array_values(array_unique(array_merge($this->selectedIds, $ids)));
+        }
+    }
+
+    private function query()
+    {
+        return Page::where('title', 'like', '%'.$this->search.'%')
+            ->orderBy('created_at', 'desc');
+    }
+
     public function render()
     {
-        $pages = Page::where('title', 'like', '%'.$this->search.'%')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return view('components.admin.page-list', compact('pages'));
+        return view('components.admin.page-list', [
+            'pages' => $this->query()->paginate(10),
+        ]);
     }
 }
