@@ -16,10 +16,23 @@ class UserList extends Component
 
     public $search = '';
 
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->hasRole('administrator')) {
+            session()->flash('error', 'Cannot delete an Administrator user.');
+            return;
+        }
+        $user->roles()->detach();
+        $user->delete();
+        session()->flash('message', 'User deleted successfully.');
+    }
+
     public function render()
     {
         $users = User::where('name', 'like', '%'.$this->search.'%')
             ->orWhere('email', 'like', '%'.$this->search.'%')
+            ->with('roles')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 

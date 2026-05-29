@@ -205,6 +205,9 @@ class DatabaseSeeder extends Seeder
         // Menus
         $this->call(MenuSeeder::class);
 
+        // Roles & Permissions
+        $this->call(RoleAndPermissionSeeder::class);
+
         // Pages
         Page::create([
             'title' => 'About Us',

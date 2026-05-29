@@ -245,7 +245,7 @@ class TourForm extends Component
             'duration_type' => $this->duration_type,
             'price' => $this->price,
             'sale_price' => $this->sale_price,
-            'max_people' => $this->max_people,
+            'max_people' => $this->max_people !== '' ? $this->max_people : null,
             'pricing' => $pricingData,
             'images' => $this->images,
             'featured_image' => $this->featured_image,
