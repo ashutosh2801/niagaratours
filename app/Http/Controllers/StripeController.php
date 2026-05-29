@@ -72,18 +72,19 @@ class StripeController extends Controller
 
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
-        $endpointSecret = config('services.stripe.webhook_secret') ?: env('STRIPE_WEBHOOK_SECRET');
+        $endpointSecret = config('services.stripe.webhook_secret');
 
-        if ($endpointSecret) {
-            try {
-                $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
-            } catch (\UnexpectedValueException $e) {
-                return response('Invalid payload', 400);
-            } catch (\Stripe\Exception\SignatureVerificationException $e) {
-                return response('Invalid signature', 400);
-            }
-        } else {
-            $event = json_decode($payload);
+        if (!$endpointSecret) {
+            Log::error('Stripe webhook secret not configured');
+            return response('Webhook secret not configured', 500);
+        }
+
+        try {
+            $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+        } catch (\UnexpectedValueException $e) {
+            return response('Invalid payload', 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            return response('Invalid signature', 400);
         }
 
         switch ($event->type ?? '') {

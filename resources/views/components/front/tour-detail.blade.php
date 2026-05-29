@@ -541,7 +541,7 @@
 
                                             <div class="prose prose-gray max-w-none text-gray-600 leading-8">
 
-                                                {!! $tour->description !!}
+                                                {!! Purify::clean($tour->description) !!}
 
                                             </div>
 
@@ -677,7 +677,7 @@
 
                                                     <div class="mt-4 text-gray-600 leading-7 text-[15px]">
 
-                                                        {!! $day['description'] ?? '' !!}
+                                                        {!! Purify::clean($day['description'] ?? '') !!}
 
                                                     </div>
 
@@ -857,7 +857,7 @@
                                                     class="px-5 py-3 text-gray-600 leading-relaxed bg-white border-t border-gray-100"
                                                 >
 
-                                                    {!! $faq['answer'] ?? '' !!}
+                                                    {!! Purify::clean($faq['answer'] ?? '') !!}
 
                                                 </div>
 

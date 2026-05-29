@@ -35,6 +35,10 @@ class UserForm extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('users')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . ($this->userId ?? 'NULL'),

@@ -30,6 +30,10 @@ class NotificationList extends Component
 
     public function markAsRead($id)
     {
+        if (!auth()->user()->hasPermission('notifications')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $notification = TourNotification::findOrFail($id);
         $notification->update([
             'is_read' => true,
@@ -39,6 +43,10 @@ class NotificationList extends Component
 
     public function markAllAsRead()
     {
+        if (!auth()->user()->hasPermission('notifications')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         TourNotification::where('is_read', false)->update([
             'is_read' => true,
             'read_at' => Carbon::now(),
@@ -47,6 +55,10 @@ class NotificationList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('notifications')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         TourNotification::findOrFail($id)->delete();
 
         if ($this->selectedNotificationId === (int) $id) {

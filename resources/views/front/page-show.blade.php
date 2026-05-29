@@ -22,7 +22,7 @@
         <div class="max-w-7xl mx-auto px-4">
             <div class="max-w-4xl mx-auto">
                 <div class="prose prose-gray prose-lg max-w-none">
-                    {!! $page->content ?? '' !!}
+                    {!! Purify::clean($page->content ?? '') !!}
                 </div>
 
                 @if(($page->images ?? null) && count($page->images) > 0)

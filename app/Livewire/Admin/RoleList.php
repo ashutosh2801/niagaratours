@@ -19,6 +19,10 @@ class RoleList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('roles')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $role = Role::findOrFail($id);
         if ($role->slug === 'administrator') {
             session()->flash('error', 'Cannot delete the Administrator role.');

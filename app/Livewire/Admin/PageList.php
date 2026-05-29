@@ -19,6 +19,10 @@ class PageList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('pages')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $page = Page::findOrFail($id);
         $title = $page->title;
         $page->delete();

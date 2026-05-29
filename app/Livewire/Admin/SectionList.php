@@ -177,6 +177,10 @@ class SectionList extends Component
 
     public function toggle($id)
     {
+        if (!auth()->user()->hasPermission('sections')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $section = HomepageSection::findOrFail($id);
         $section->update(['is_enabled' => !$section->is_enabled]);
         ActivityLogger::log('updated', 'Section', "Section '{$section->key}' " . ($section->is_enabled ? 'enabled' : 'disabled'));
@@ -297,6 +301,10 @@ class SectionList extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('sections')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $section = HomepageSection::findOrFail($this->editId);
 
         $settings = match ($section->key) {

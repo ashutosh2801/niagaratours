@@ -19,6 +19,10 @@ class UserList extends Component
 
     public function deleteUser($id)
     {
+        if (!auth()->user()->hasPermission('users')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $user = User::findOrFail($id);
         if ($user->hasRole('administrator')) {
             session()->flash('error', 'Cannot delete an Administrator user.');

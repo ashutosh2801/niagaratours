@@ -55,6 +55,10 @@ class CategoryForm extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('categories')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:categories,slug,' . $this->categoryId,

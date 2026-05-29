@@ -67,7 +67,7 @@ class TourSearch extends Component
             $query->where('price', '<=', $this->max_price);
         }
 
-        $tours = $query->paginate(12);
+        $tours = $query->with('category')->paginate(12);
         $categories = Category::where('is_active', true)->orderBy('name')->get();
 
         return view('components.front.tour-search', [

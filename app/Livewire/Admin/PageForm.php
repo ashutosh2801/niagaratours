@@ -65,12 +65,18 @@ class PageForm extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('pages')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:pages,slug,' . $this->pageId,
             'template' => 'required|string|max:50',
             'is_active' => 'boolean',
         ]);
+
+        $this->content = \Stevebauman\Purify\Facades\Purify::clean($this->content);
 
         $data = [
             'title' => $this->title,

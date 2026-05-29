@@ -19,6 +19,10 @@ class TourList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('tours')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $tour = Tour::findOrFail($id);
         $title = $tour->title;
         $tour->delete();

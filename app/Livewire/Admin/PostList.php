@@ -26,12 +26,18 @@ class PostList extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('posts')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'title' => 'required|string|max:255',
             'excerpt' => 'nullable|string',
             'content' => 'nullable|string',
             'author' => 'nullable|string|max:255',
         ]);
+
+        $this->content = \Stevebauman\Purify\Facades\Purify::clean($this->content);
 
         Post::updateOrCreate(['id' => $this->editId], [
             'title' => $this->title,
@@ -64,6 +70,10 @@ class PostList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('posts')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $post = Post::findOrFail($id);
         $title = $post->title;
         $post->delete();
@@ -72,6 +82,10 @@ class PostList extends Component
 
     public function toggleActive($id)
     {
+        if (!auth()->user()->hasPermission('posts')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $post = Post::findOrFail($id);
         $post->update(['is_active' => !$post->is_active]);
         ActivityLogger::log('updated', 'Post', "Post '{$post->title}' " . ($post->is_active ? 'activated' : 'deactivated'));

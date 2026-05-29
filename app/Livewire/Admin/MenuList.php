@@ -46,6 +46,10 @@ class MenuList extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('menus')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'label' => 'required|string|max:255',
             'url' => 'nullable|string|max:255',
@@ -80,6 +84,10 @@ class MenuList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('menus')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $menu = Menu::findOrFail($id);
         $label = $menu->label;
         $menu->delete();
@@ -106,6 +114,10 @@ class MenuList extends Component
 
     public function addTour($id)
     {
+        if (!auth()->user()->hasPermission('menus')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $tour = Tour::findOrFail($id);
         $exists = Menu::where('label', $tour->title)->exists();
         if ($exists) {
@@ -124,6 +136,10 @@ class MenuList extends Component
 
     public function addCategory($id)
     {
+        if (!auth()->user()->hasPermission('menus')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $category = Category::findOrFail($id);
         $exists = Menu::where('label', $category->name)->exists();
         if ($exists) {

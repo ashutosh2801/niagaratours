@@ -25,6 +25,10 @@ class DestinationList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('destinations')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $destination = Destination::findOrFail($id);
         $name = $destination->name;
         $destination->delete();

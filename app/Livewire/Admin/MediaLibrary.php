@@ -31,6 +31,10 @@ class MediaLibrary extends Component
 
     public function updatedUploads()
     {
+        if (!auth()->user()->hasPermission('media')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate();
 
         $disk = Setting::get('storage_disk', 'public');
@@ -63,6 +67,10 @@ class MediaLibrary extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('media')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $media = Media::findOrFail($id);
         $name = $media->name;
         Storage::disk($media->disk ?? Setting::get('storage_disk', 'public'))->delete($media->path);

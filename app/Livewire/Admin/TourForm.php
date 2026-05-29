@@ -198,6 +198,10 @@ class TourForm extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('tours')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:tours,slug,' . $this->tourId,
@@ -233,6 +237,16 @@ class TourForm extends Component
         $prices = collect($pricingData['categories']);
         $this->price = $prices->pluck('sale_price')->merge($prices->pluck('price'))->filter(fn($v) => !is_null($v) && $v > 0)->sort()->first() ?? 0;
         $this->sale_price = $prices->pluck('sale_price')->filter(fn($v) => !is_null($v) && $v > 0)->sort()->first();
+
+        $this->description = \Stevebauman\Purify\Facades\Purify::clean($this->description);
+        $this->itinerary = collect($this->itinerary)->map(fn($day) => [
+            ...$day,
+            'description' => \Stevebauman\Purify\Facades\Purify::clean($day['description'] ?? ''),
+        ])->toArray();
+        $this->faqs = collect($this->faqs)->map(fn($faq) => [
+            ...$faq,
+            'answer' => \Stevebauman\Purify\Facades\Purify::clean($faq['answer'] ?? ''),
+        ])->toArray();
 
         $data = [
             'title' => $this->title,

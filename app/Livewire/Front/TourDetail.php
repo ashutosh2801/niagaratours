@@ -12,6 +12,7 @@ class TourDetail extends Component
     public $slug;
     public $quantities = [];
     public $travelDate;
+    private ?Tour $tourCache = null;
 
     public function mount($slug)
     {
@@ -21,10 +22,13 @@ class TourDetail extends Component
 
     public function getTour()
     {
-        return Tour::where('slug', $this->slug)
-            ->where('is_active', true)
-            ->with(['category', 'destination', 'orderItems'])
-            ->first();
+        if ($this->tourCache === null) {
+            $this->tourCache = Tour::where('slug', $this->slug)
+                ->where('is_active', true)
+                ->with(['category', 'destination', 'orderItems'])
+                ->first();
+        }
+        return $this->tourCache;
     }
 
     public function getPricingProperty()

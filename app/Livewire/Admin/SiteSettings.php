@@ -76,6 +76,10 @@ class SiteSettings extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('settings')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'site_name' => 'required|string|max:255',
             'contact_email' => 'nullable|email|max:255',

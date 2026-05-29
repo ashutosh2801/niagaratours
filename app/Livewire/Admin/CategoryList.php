@@ -19,6 +19,10 @@ class CategoryList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('categories')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $category = Category::findOrFail($id);
         $name = $category->name;
         $category->delete();

@@ -16,6 +16,10 @@ class NewsletterList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('newsletter')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         NewsletterSubscription::findOrFail($id)->delete();
     }
 

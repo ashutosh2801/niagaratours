@@ -8,9 +8,10 @@
     @if($label)
         <label class="block text-sm font-medium text-gray-700 mb-1">{{ $label }}</label>
     @endif
+    @php $clean = Purify::clean($value); @endphp
     <div wire:ignore>
-        <div id="{{ $summernoteId }}" class="summernote-editor">{!! $value !!}</div>
-        <input type="hidden" id="{{ $summernoteId }}-input" value="{{ $value }}" @if($ref)data-summernote-{{ $ref }}="true"@endif>
+        <div id="{{ $summernoteId }}" class="summernote-editor">{!! $clean !!}</div>
+        <input type="hidden" id="{{ $summernoteId }}-input" value="{{ $clean }}" @if($ref)data-summernote-{{ $ref }}="true"@endif>
     </div>
     @if($error)
         <p class="mt-1 text-xs text-red-600">{{ $error }}</p>

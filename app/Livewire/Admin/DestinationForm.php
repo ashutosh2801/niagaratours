@@ -57,6 +57,10 @@ class DestinationForm extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('destinations')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:destinations,slug,' . $this->destinationId,

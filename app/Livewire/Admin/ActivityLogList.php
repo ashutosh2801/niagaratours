@@ -3,8 +3,11 @@
 namespace App\Livewire\Admin;
 
 use App\Models\ActivityLog;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
+
+#[Layout('layouts.admin')]
 
 class ActivityLogList extends Component
 {

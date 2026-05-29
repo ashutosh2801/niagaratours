@@ -54,6 +54,10 @@ class RoleForm extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('roles')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:roles,slug,' . $this->roleId,

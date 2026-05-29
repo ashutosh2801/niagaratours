@@ -9,7 +9,8 @@ class FeaturedTours extends Component
 {
     public function render()
     {
-        $tours = Tour::where('is_active', true)
+        $tours = Tour::with('category')
+            ->where('is_active', true)
             ->where('is_featured', true)
             ->take(6)
             ->get();

@@ -24,6 +24,10 @@ class OrderShow extends Component
 
     public function updateStatus()
     {
+        if (!auth()->user()->hasPermission('orders')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'newStatus' => ['required', 'in:' . implode(',', [
                 Order::STATUS_PENDING,

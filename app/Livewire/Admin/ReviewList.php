@@ -24,6 +24,10 @@ class ReviewList extends Component
 
     public function save()
     {
+        if (!auth()->user()->hasPermission('reviews')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $this->validate([
             'name' => 'required|string|max:255',
             'content' => 'required|string',
@@ -63,6 +67,10 @@ class ReviewList extends Component
 
     public function delete($id)
     {
+        if (!auth()->user()->hasPermission('reviews')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $review = Review::findOrFail($id);
         $name = $review->name;
         $review->delete();
@@ -71,6 +79,10 @@ class ReviewList extends Component
 
     public function toggleActive($id)
     {
+        if (!auth()->user()->hasPermission('reviews')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $review = Review::findOrFail($id);
         $review->update(['is_active' => !$review->is_active]);
         ActivityLogger::log('updated', 'Review', "Review '{$review->name}' " . ($review->is_active ? 'activated' : 'deactivated'));
