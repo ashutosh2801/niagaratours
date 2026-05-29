@@ -233,75 +233,14 @@
                 <div>
 
                     <p class="text-sm uppercase tracking-[3px] text-red-600 font-semibold mb-4">
-                        Send A Massage
+                        Send A Message
                     </p>
 
                     <h2 class="text-lg md:text-2xl font-bold text-gray-700 leading-tight mb-4">
                         Looking For Any Help
                     </h2>
 
-                    <form class="space-y-7">
-
-                        <!-- Name -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-3">
-                                Name <span class="text-orange-500">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                placeholder="Your Name"
-                                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-600"
-                            >
-                        </div>
-
-                        <!-- Email -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-3">
-                                Email <span class="text-orange-500">*</span>
-                            </label>
-
-                            <input
-                                type="email"
-                                placeholder="Your Email"
-                                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-600"
-                            >
-                        </div>
-
-                        <!-- Subject -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-3">
-                                Subject <span class="text-orange-500">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                placeholder="Your Subject"
-                                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-600"
-                            >
-                        </div>
-
-                        <!-- Message -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-3">
-                                Message <span class="text-orange-500">*</span>
-                            </label>
-
-                            <textarea
-                                rows="3"
-                                placeholder="Write your message"
-                                class="w-full rounded-2xl border border-gray-200 bg-white px-6 py-5 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-600"
-                            ></textarea>
-                        </div>
-
-                        <!-- Button -->
-                        <button
-                            type="submit"
-                            class="w-full h-14 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold text-base transition duration-300">
-                            Submit Now →
-                        </button>
-
-                    </form>
+                    <livewire:front.contact-form />
 
                 </div>
 
