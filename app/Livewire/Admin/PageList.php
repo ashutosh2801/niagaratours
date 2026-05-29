@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Page;
+use App\Helpers\ActivityLogger;
 
 #[Title('Pages')]
 #[Layout('layouts.admin')]
@@ -18,8 +19,11 @@ class PageList extends Component
 
     public function delete($id)
     {
-        Page::findOrFail($id)->delete();
+        $page = Page::findOrFail($id);
+        $title = $page->title;
+        $page->delete();
         session()->flash('message', 'Page deleted successfully.');
+        ActivityLogger::log('deleted', 'Page', "Page '{$title}' deleted");
     }
 
     public function render()

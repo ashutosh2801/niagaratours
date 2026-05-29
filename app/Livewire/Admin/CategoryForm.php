@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Category;
 use Illuminate\Support\Str;
+use App\Helpers\ActivityLogger;
 
 #[Title('Category Form')]
 #[Layout('layouts.admin')]
@@ -75,9 +76,11 @@ class CategoryForm extends Component
             $category = Category::findOrFail($this->categoryId);
             $category->update($data);
             session()->flash('message', 'Category updated successfully.');
+            ActivityLogger::log('updated', 'Category', "Category '{$this->name}' updated");
         } else {
             Category::create($data);
             session()->flash('message', 'Category created successfully.');
+            ActivityLogger::log('created', 'Category', "Category '{$this->name}' created");
         }
 
         return redirect()->route('admin.categories');

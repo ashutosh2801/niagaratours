@@ -8,6 +8,7 @@ use Livewire\Component;
 use App\Models\Menu;
 use App\Models\Tour;
 use App\Models\Category;
+use App\Helpers\ActivityLogger;
 
 #[Title('Menu Manager')]
 #[Layout('layouts.admin')]
@@ -66,9 +67,11 @@ class MenuList extends Component
         if ($this->editId) {
             Menu::findOrFail($this->editId)->update($data);
             session()->flash('message', 'Menu item updated.');
+            ActivityLogger::log('updated', 'Menu', "Menu item '{$this->label}' updated");
         } else {
             Menu::create($data);
             session()->flash('message', 'Menu item created.');
+            ActivityLogger::log('created', 'Menu', "Menu item '{$this->label}' created");
         }
 
         $this->showForm = false;
@@ -77,8 +80,11 @@ class MenuList extends Component
 
     public function delete($id)
     {
-        Menu::findOrFail($id)->delete();
+        $menu = Menu::findOrFail($id);
+        $label = $menu->label;
+        $menu->delete();
         session()->flash('message', 'Menu item deleted.');
+        ActivityLogger::log('deleted', 'Menu', "Menu item '{$label}' deleted");
     }
 
     public function cancel()
@@ -113,6 +119,7 @@ class MenuList extends Component
             'is_active' => true,
         ]);
         session()->flash('message', '"' . $tour->title . '" added to menu.');
+        ActivityLogger::log('created', 'Menu', "Menu item '{$tour->title}' added to menu");
     }
 
     public function addCategory($id)
@@ -130,6 +137,7 @@ class MenuList extends Component
             'is_active' => true,
         ]);
         session()->flash('message', '"' . $category->name . '" added to menu.');
+        ActivityLogger::log('created', 'Menu', "Menu item '{$category->name}' added to menu");
     }
 
     public function render()

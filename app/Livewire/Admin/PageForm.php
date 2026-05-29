@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Page;
 use Illuminate\Support\Str;
+use App\Helpers\ActivityLogger;
 
 #[Title('Page Form')]
 #[Layout('layouts.admin')]
@@ -86,9 +87,11 @@ class PageForm extends Component
             $page = Page::findOrFail($this->pageId);
             $page->update($data);
             session()->flash('message', 'Page updated successfully.');
+            ActivityLogger::log('updated', 'Page', "Page '{$this->title}' updated");
         } else {
             Page::create($data);
             session()->flash('message', 'Page created successfully.');
+            ActivityLogger::log('created', 'Page', "Page '{$this->title}' created");
         }
 
         return redirect()->route('admin.pages');

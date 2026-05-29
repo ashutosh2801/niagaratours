@@ -18,6 +18,7 @@ use App\Livewire\Admin\CategoryList;
 use App\Livewire\Admin\CategoryForm;
 use App\Livewire\Admin\DestinationList;
 use App\Livewire\Admin\DestinationForm;
+use App\Livewire\Admin\ActivityLogList;
 
 Route::view('/', 'welcome')->name('home');
 Route::get('/tours', App\Livewire\Front\TourList::class)->name('tours');
@@ -84,5 +85,6 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/posts', App\Livewire\Admin\PostList::class)->name('posts');
     Route::get('/newsletter', App\Livewire\Admin\NewsletterList::class)->name('newsletter');
     Route::get('/settings', App\Livewire\Admin\SiteSettings::class)->name('settings');
+    Route::get('/activity-logs', ActivityLogList::class)->name('activity-logs');
 });
 

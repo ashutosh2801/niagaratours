@@ -6,6 +6,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Order;
+use App\Helpers\ActivityLogger;
 
 #[Title('Order Details')]
 #[Layout('layouts.admin')]
@@ -37,6 +38,7 @@ class OrderShow extends Component
         $order = Order::findOrFail($this->orderId);
         $order->update(['status' => $this->newStatus]);
         session()->flash('message', 'Order status updated successfully.');
+        ActivityLogger::log('updated', 'Order', "Order #{$order->id} status updated to {$this->newStatus}");
     }
 
     public function render()

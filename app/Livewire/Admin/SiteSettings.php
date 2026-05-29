@@ -6,6 +6,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Setting;
+use App\Helpers\ActivityLogger;
 
 #[Title('Site Settings')]
 #[Layout('layouts.admin')]
@@ -111,6 +112,7 @@ class SiteSettings extends Component
         }
 
         session()->flash('message', 'Settings saved successfully.');
+        ActivityLogger::log('updated', 'Settings', 'Site settings updated');
     }
 
     public function render()

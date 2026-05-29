@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Tour;
+use App\Helpers\ActivityLogger;
 
 #[Title('Tours')]
 #[Layout('layouts.admin')]
@@ -18,8 +19,11 @@ class TourList extends Component
 
     public function delete($id)
     {
-        Tour::findOrFail($id)->delete();
+        $tour = Tour::findOrFail($id);
+        $title = $tour->title;
+        $tour->delete();
         session()->flash('message', 'Tour deleted successfully.');
+        ActivityLogger::log('deleted', 'Tour', "Tour '{$title}' deleted");
     }
 
     public function render()

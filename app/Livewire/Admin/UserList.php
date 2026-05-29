@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
+use App\Helpers\ActivityLogger;
 
 #[Title('Users')]
 #[Layout('layouts.admin')]
@@ -23,9 +24,11 @@ class UserList extends Component
             session()->flash('error', 'Cannot delete an Administrator user.');
             return;
         }
+        $name = $user->name;
         $user->roles()->detach();
         $user->delete();
         session()->flash('message', 'User deleted successfully.');
+        ActivityLogger::log('deleted', 'User', "User '{$name}' deleted");
     }
 
     public function render()

@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Helpers\ActivityLogger;
 
 #[Title('Homepage')]
 #[Layout('layouts.admin')]
@@ -178,6 +179,7 @@ class SectionList extends Component
     {
         $section = HomepageSection::findOrFail($id);
         $section->update(['is_enabled' => !$section->is_enabled]);
+        ActivityLogger::log('updated', 'Section', "Section '{$section->key}' " . ($section->is_enabled ? 'enabled' : 'disabled'));
     }
 
     public function edit($id)
@@ -368,6 +370,7 @@ class SectionList extends Component
         $section->update(['settings' => $settings]);
         $this->cancelEdit();
         session()->flash('message', 'Section settings saved successfully.');
+        ActivityLogger::log('updated', 'Section', "Section '{$section->key}' settings saved");
     }
 
     public function reorderSections($ids)
@@ -378,6 +381,7 @@ class SectionList extends Component
         foreach (array_values($ids) as $index => $id) {
             HomepageSection::where('id', $id)->update(['sort_order' => $index + 1]);
         }
+        ActivityLogger::log('updated', 'Section', 'Section order reordered');
     }
 
     public function render()

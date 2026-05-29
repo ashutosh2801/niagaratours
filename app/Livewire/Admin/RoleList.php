@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Role;
+use App\Helpers\ActivityLogger;
 
 #[Title('Roles')]
 #[Layout('layouts.admin')]
@@ -23,10 +24,12 @@ class RoleList extends Component
             session()->flash('error', 'Cannot delete the Administrator role.');
             return;
         }
+        $name = $role->name;
         $role->permissions()->detach();
         $role->users()->detach();
         $role->delete();
         session()->flash('message', 'Role deleted successfully.');
+        ActivityLogger::log('deleted', 'Role', "Role '{$name}' deleted");
     }
 
     public function render()

@@ -736,6 +736,7 @@
     });
     </script>
     @livewireScripts
+    <script>if (window.__registerAlpineCollapse) window.__registerAlpineCollapse()</script>
     @stack('scripts')
 </body>
 </html>

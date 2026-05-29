@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Destination;
+use App\Helpers\ActivityLogger;
 
 #[Title('Destinations')]
 #[Layout('layouts.admin')]
@@ -24,8 +25,11 @@ class DestinationList extends Component
 
     public function delete($id)
     {
-        Destination::findOrFail($id)->delete();
+        $destination = Destination::findOrFail($id);
+        $name = $destination->name;
+        $destination->delete();
         session()->flash('message', 'Destination deleted successfully.');
+        ActivityLogger::log('deleted', 'Destination', "Destination '{$name}' deleted");
     }
 
     public function render()

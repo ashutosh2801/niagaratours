@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\User;
 use App\Models\Role;
+use App\Helpers\ActivityLogger;
 
 #[Layout('layouts.admin')]
 class UserForm extends Component
@@ -58,6 +59,7 @@ class UserForm extends Component
             $user->update($data);
             $user->roles()->sync($roleIds);
             session()->flash('message', 'User updated successfully.');
+            ActivityLogger::log('updated', 'User', "User '{$this->name}' updated");
         } else {
             $user = User::create([
                 'name' => $this->name,
@@ -67,6 +69,7 @@ class UserForm extends Component
             ]);
             $user->roles()->sync($roleIds);
             session()->flash('message', 'User created successfully.');
+            ActivityLogger::log('created', 'User', "User '{$this->name}' created");
         }
 
         return redirect()->route('admin.users');

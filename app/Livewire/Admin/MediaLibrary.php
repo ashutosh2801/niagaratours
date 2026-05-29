@@ -12,6 +12,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Helpers\ActivityLogger;
 
 #[Title('Media Library')]
 #[Layout('layouts.admin')]
@@ -52,6 +53,7 @@ class MediaLibrary extends Component
 
         $this->uploads = [];
         session()->flash('message', $count . ' file(s) uploaded successfully.');
+        ActivityLogger::log('created', 'Media', "{$count} file(s) uploaded to media library");
     }
 
     public function getDisk(): string
@@ -62,9 +64,11 @@ class MediaLibrary extends Component
     public function delete($id)
     {
         $media = Media::findOrFail($id);
+        $name = $media->name;
         Storage::disk($media->disk ?? Setting::get('storage_disk', 'public'))->delete($media->path);
         $media->delete();
         session()->flash('message', 'File deleted successfully.');
+        ActivityLogger::log('deleted', 'Media', "File '{$name}' deleted from media library");
     }
 
     public function render()

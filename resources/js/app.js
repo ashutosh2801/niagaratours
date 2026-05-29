@@ -1,5 +1,5 @@
 import collapse from '@alpinejs/collapse'
 
-document.addEventListener('livewire:init', () => {
+window.__registerAlpineCollapse = function () {
     Alpine.plugin(collapse)
-})
+}

@@ -29,51 +29,48 @@ class RoleAndPermissionSeeder extends Seeder
             ['name' => 'Users', 'slug' => 'users', 'group' => 'System'],
             ['name' => 'Settings', 'slug' => 'settings', 'group' => 'System'],
             ['name' => 'Roles', 'slug' => 'roles', 'group' => 'System'],
+            ['name' => 'Activity Log', 'slug' => 'activity-logs', 'group' => 'System'],
         ];
 
         foreach ($permissions as $perm) {
-            Permission::create($perm);
+            Permission::firstOrCreate(['slug' => $perm['slug']], $perm);
         }
 
         $allPermissionSlugs = array_column($permissions, 'slug');
 
         // Administrator - all permissions
-        $adminRole = Role::create([
-            'name' => 'Administrator',
-            'slug' => 'administrator',
-            'description' => 'Full access to all modules',
-        ]);
+        $adminRole = Role::firstOrCreate(
+            ['slug' => 'administrator'],
+            ['name' => 'Administrator', 'description' => 'Full access to all modules'],
+        );
         $adminRole->permissions()->sync(Permission::whereIn('slug', $allPermissionSlugs)->pluck('id'));
 
         // Admin - almost all except roles
-        $roleAdmin = Role::create([
-            'name' => 'Admin',
-            'slug' => 'admin',
-            'description' => 'Access to most modules except role management',
-        ]);
+        $roleAdmin = Role::firstOrCreate(
+            ['slug' => 'admin'],
+            ['name' => 'Admin', 'description' => 'Access to most modules except role management'],
+        );
         $roleAdmin->permissions()->sync(Permission::whereIn('slug', [
             'dashboard', 'tours', 'categories', 'destinations', 'orders', 'payments',
             'pages', 'notifications', 'reviews', 'posts', 'newsletter',
-            'media', 'sections', 'menus', 'users', 'settings',
+            'media', 'sections', 'menus', 'users', 'settings', 'activity-logs',
         ])->pluck('id'));
 
         // Editor - content only
-        $editorRole = Role::create([
-            'name' => 'Editor',
-            'slug' => 'editor',
-            'description' => 'Access to content management modules',
-        ]);
+        $editorRole = Role::firstOrCreate(
+            ['slug' => 'editor'],
+            ['name' => 'Editor', 'description' => 'Access to content management modules'],
+        );
         $editorRole->permissions()->sync(Permission::whereIn('slug', [
             'dashboard', 'tours', 'categories', 'destinations', 'orders',
             'pages', 'notifications', 'reviews', 'posts', 'media',
         ])->pluck('id'));
 
         // Customer - minimal access
-        $customerRole = Role::create([
-            'name' => 'Customer',
-            'slug' => 'customer',
-            'description' => 'Limited front-facing access',
-        ]);
+        $customerRole = Role::firstOrCreate(
+            ['slug' => 'customer'],
+            ['name' => 'Customer', 'description' => 'Limited front-facing access'],
+        );
         $customerRole->permissions()->sync(Permission::whereIn('slug', [
             'dashboard', 'orders',
         ])->pluck('id'));

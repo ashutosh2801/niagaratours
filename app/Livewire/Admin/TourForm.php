@@ -9,6 +9,7 @@ use App\Models\Tour;
 use App\Models\Category;
 use App\Models\Destination;
 use Illuminate\Support\Str;
+use App\Helpers\ActivityLogger;
 
 #[Title('Tour Form')]
 #[Layout('layouts.admin')]
@@ -266,9 +267,11 @@ class TourForm extends Component
             $tour = Tour::findOrFail($this->tourId);
             $tour->update($data);
             session()->flash('message', 'Tour updated successfully.');
+            ActivityLogger::log('updated', 'Tour', "Tour '{$this->title}' updated");
         } else {
             Tour::create($data);
             session()->flash('message', 'Tour created successfully.');
+            ActivityLogger::log('created', 'Tour', "Tour '{$this->title}' created");
         }
 
         return redirect()->route('admin.tours');

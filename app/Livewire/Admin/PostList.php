@@ -7,6 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Helpers\ActivityLogger;
 
 #[Title('Blog Posts')]
 #[Layout('layouts.admin')]
@@ -44,6 +45,8 @@ class PostList extends Component
 
         $this->resetForm();
         $this->successMessage = 'Post saved successfully.';
+        $action = $this->editId ? 'updated' : 'created';
+        ActivityLogger::log($action, 'Post', "Post '{$this->title}' {$action}");
     }
 
     public function edit($id)
@@ -61,13 +64,17 @@ class PostList extends Component
 
     public function delete($id)
     {
-        Post::findOrFail($id)->delete();
+        $post = Post::findOrFail($id);
+        $title = $post->title;
+        $post->delete();
+        ActivityLogger::log('deleted', 'Post', "Post '{$title}' deleted");
     }
 
     public function toggleActive($id)
     {
         $post = Post::findOrFail($id);
         $post->update(['is_active' => !$post->is_active]);
+        ActivityLogger::log('updated', 'Post', "Post '{$post->title}' " . ($post->is_active ? 'activated' : 'deactivated'));
     }
 
     public function resetForm()

@@ -7,6 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Helpers\ActivityLogger;
 
 #[Title('Reviews')]
 #[Layout('layouts.admin')]
@@ -39,6 +40,8 @@ class ReviewList extends Component
 
         $this->resetForm();
         session()->flash('message', 'Review saved successfully.');
+        $action = $this->editId ? 'updated' : 'created';
+        ActivityLogger::log($action, 'Review', "Review '{$this->name}' {$action}");
     }
 
     public function addNew()
@@ -60,13 +63,17 @@ class ReviewList extends Component
 
     public function delete($id)
     {
-        Review::findOrFail($id)->delete();
+        $review = Review::findOrFail($id);
+        $name = $review->name;
+        $review->delete();
+        ActivityLogger::log('deleted', 'Review', "Review '{$name}' deleted");
     }
 
     public function toggleActive($id)
     {
         $review = Review::findOrFail($id);
         $review->update(['is_active' => !$review->is_active]);
+        ActivityLogger::log('updated', 'Review', "Review '{$review->name}' " . ($review->is_active ? 'activated' : 'deactivated'));
     }
 
     public function resetForm()

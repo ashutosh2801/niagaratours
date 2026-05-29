@@ -8,6 +8,7 @@ use Livewire\Component;
 use App\Models\Role;
 use App\Models\Permission;
 use Illuminate\Support\Str;
+use App\Helpers\ActivityLogger;
 
 #[Title('Role Form')]
 #[Layout('layouts.admin')]
@@ -71,10 +72,12 @@ class RoleForm extends Component
             $role->update($data);
             $role->permissions()->sync($this->selectedPermissions);
             session()->flash('message', 'Role updated successfully.');
+            ActivityLogger::log('updated', 'Role', "Role '{$this->name}' updated");
         } else {
             $role = Role::create($data);
             $role->permissions()->sync($this->selectedPermissions);
             session()->flash('message', 'Role created successfully.');
+            ActivityLogger::log('created', 'Role', "Role '{$this->name}' created");
         }
 
         return redirect()->route('admin.roles');

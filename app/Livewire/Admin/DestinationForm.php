@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Destination;
 use Illuminate\Support\Str;
+use App\Helpers\ActivityLogger;
 
 #[Title('Destination Form')]
 #[Layout('layouts.admin')]
@@ -79,9 +80,11 @@ class DestinationForm extends Component
             $destination = Destination::findOrFail($this->destinationId);
             $destination->update($data);
             session()->flash('message', 'Destination updated successfully.');
+            ActivityLogger::log('updated', 'Destination', "Destination '{$this->name}' updated");
         } else {
             Destination::create($data);
             session()->flash('message', 'Destination created successfully.');
+            ActivityLogger::log('created', 'Destination', "Destination '{$this->name}' created");
         }
 
         return redirect()->route('admin.destinations');

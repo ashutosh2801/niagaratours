@@ -2,6 +2,7 @@
 <section
     x-data="heroSlider()"
     x-init="startSlider()"
+    x-cloak
     class="relative overflow-hidden md:rounded-[34px] container-fluid mx-auto md:px-4"
     style="height: 80vh;"
 >
@@ -9,16 +10,16 @@
     <template x-for="(slide, index) in slides" :key="index">
         <div
             x-show="currentSlide === index"
-            x-transition:enter="transition-opacity duration-[2000ms] ease-out"
-            x-transition:enter-start="opacity-0 scale-105"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition-opacity duration-[2000ms] ease-in"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-110"
+            x-transition:enter="transition-opacity duration-1000"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity duration-1000"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
             class="absolute inset-0"
         >
             <div
-                class="absolute inset-0 bg-cover bg-center bg-no-repeat scale-100 animate-slowZoom"
+                class="absolute inset-0 bg-cover bg-center bg-no-repeat"
                 :style="`background-image:url(${slide})`"
             ></div>
         </div>

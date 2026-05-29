@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Category;
+use App\Helpers\ActivityLogger;
 
 #[Title('Categories')]
 #[Layout('layouts.admin')]
@@ -18,8 +19,11 @@ class CategoryList extends Component
 
     public function delete($id)
     {
-        Category::findOrFail($id)->delete();
+        $category = Category::findOrFail($id);
+        $name = $category->name;
+        $category->delete();
         session()->flash('message', 'Category deleted successfully.');
+        ActivityLogger::log('deleted', 'Category', "Category '{$name}' deleted");
     }
 
     public function render()
