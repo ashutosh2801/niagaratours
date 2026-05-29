@@ -8,44 +8,67 @@ use Livewire\Component;
 use App\Models\User;
 use App\Models\Role;
 
-#[Title('Edit User')]
 #[Layout('layouts.admin')]
 class UserForm extends Component
 {
-    public $userId;
+    public $userId = null;
     public $name;
     public $email;
     public $phone;
-    public $selectedRoles = [];
+    public $password;
+    public $password_confirmation;
+    public $selectedRole = '';
 
-    public function mount($userId)
+    public function mount($userId = null)
     {
         $this->userId = $userId;
-        $user = User::with('roles')->findOrFail($this->userId);
-        $this->name = $user->name;
-        $this->email = $user->email;
-        $this->phone = $user->phone;
-        $this->selectedRoles = $user->roles->pluck('id')->map(fn($id) => (string) $id)->toArray();
+
+        if ($this->userId) {
+            $user = User::with('roles')->findOrFail($this->userId);
+            $this->name = $user->name;
+            $this->email = $user->email;
+            $this->phone = $user->phone;
+            $this->selectedRole = $user->roles->first()?->id ? (string) $user->roles->first()->id : '';
+        }
     }
 
     public function save()
     {
-        $this->validate([
+        $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $this->userId,
+            'email' => 'required|email|max:255|unique:users,email,' . ($this->userId ?? 'NULL'),
             'phone' => 'nullable|string|max:20',
-            'selectedRoles' => 'array',
-        ]);
+            'selectedRole' => 'nullable|exists:roles,id',
+        ];
 
-        $user = User::findOrFail($this->userId);
-        $user->update([
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-        ]);
-        $user->roles()->sync($this->selectedRoles);
+        if (!$this->userId) {
+            $rules['password'] = 'required|string|min:8|confirmed';
+        }
 
-        session()->flash('message', 'User updated successfully.');
+        $this->validate($rules);
+
+        $roleIds = $this->selectedRole ? [$this->selectedRole] : [];
+
+        if ($this->userId) {
+            $user = User::findOrFail($this->userId);
+            $data = ['name' => $this->name, 'email' => $this->email, 'phone' => $this->phone];
+            if ($this->password) {
+                $data['password'] = bcrypt($this->password);
+            }
+            $user->update($data);
+            $user->roles()->sync($roleIds);
+            session()->flash('message', 'User updated successfully.');
+        } else {
+            $user = User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'password' => bcrypt($this->password),
+            ]);
+            $user->roles()->sync($roleIds);
+            session()->flash('message', 'User created successfully.');
+        }
+
         return redirect()->route('admin.users');
     }
 

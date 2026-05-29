@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/pages/{pageId}/edit', PageForm::class)->name('pages.edit');
     Route::get('/notifications', NotificationList::class)->name('notifications');
     Route::get('/users', UserList::class)->name('users');
+    Route::get('/users/create', App\Livewire\Admin\UserForm::class)->name('users.create');
     Route::get('/users/{userId}/edit', App\Livewire\Admin\UserForm::class)->name('users.edit');
     Route::get('/roles', App\Livewire\Admin\RoleList::class)->name('roles');
     Route::get('/roles/create', App\Livewire\Admin\RoleForm::class)->name('roles.create');

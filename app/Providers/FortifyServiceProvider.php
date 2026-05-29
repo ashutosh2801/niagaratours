@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -17,7 +18,12 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(LogoutResponse::class, fn () => new class implements LogoutResponse {
+            public function toResponse($request): \Symfony\Component\HttpFoundation\Response
+            {
+                return redirect('/login');
+            }
+        });
     }
 
     /**
@@ -43,7 +49,8 @@ class FortifyServiceProvider extends ServiceProvider
      */
     private function configureViews(): void
     {
-        Fortify::loginView(fn () => view('pages::auth.login'));
+        Fortify::loginView(fn () => view('pages.auth.login'));
+        Fortify::requestPasswordResetLinkView(fn () => view('pages.auth.forgot-password'));
     }
 
     /**

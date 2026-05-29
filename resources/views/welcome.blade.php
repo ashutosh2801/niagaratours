@@ -585,6 +585,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!el) return;
     new Swiper(".destinationSwiper", {
         loop: true,
+        watchOverflow: true,
         spaceBetween: 20,
         slidesPerView: 1,
         autoplay: {
@@ -611,6 +612,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!reviewEl) return;
     new Swiper(".reviewSwiper", {
         loop: true,
+        watchOverflow: true,
         spaceBetween: 25,
         grabCursor: true,
         centeredSlides: false,
@@ -634,6 +636,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!blogEl) return;
     new Swiper(".blogSwiper", {
         loop: true,
+        watchOverflow: true,
         spaceBetween: 28,
         speed: 900,
         grabCursor: true,

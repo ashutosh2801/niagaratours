@@ -15,6 +15,7 @@ class ReviewList extends Component
     use WithPagination;
 
     public $editId = null;
+    public $showForm = false;
     public $name = '';
     public $location = '';
     public $content = '';
@@ -37,7 +38,13 @@ class ReviewList extends Component
         ]);
 
         $this->resetForm();
-        $this->successMessage = 'Review saved successfully.';
+        session()->flash('message', 'Review saved successfully.');
+    }
+
+    public function addNew()
+    {
+        $this->resetForm();
+        $this->dispatch('show-review-form');
     }
 
     public function edit($id)
@@ -48,6 +55,7 @@ class ReviewList extends Component
         $this->location = $review->location;
         $this->content = $review->content;
         $this->rating = $review->rating;
+        $this->dispatch('show-review-form');
     }
 
     public function delete($id)
@@ -64,6 +72,7 @@ class ReviewList extends Component
     public function resetForm()
     {
         $this->reset(['editId', 'name', 'location', 'content', 'rating']);
+        $this->rating = 5;
     }
 
     public function render()

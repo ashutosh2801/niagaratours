@@ -4,50 +4,53 @@
             <h2 class="text-xl font-semibold text-gray-900">Reviews</h2>
             <p class="text-sm text-gray-500 mt-1">Manage customer testimonials</p>
         </div>
-        @if(!$editId)
-            <button wire:click="resetForm" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">Add Review</button>
-        @endif
+        <button wire:click="addNew" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">Add Review</button>
     </div>
 
     @if(session('message'))
         <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">{{ session('message') }}</div>
     @endif
 
-    @if($editId !== null || !$reviews->count())
-        <form wire:submit="save" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    {{-- Modal --}}
+    <div wire:ignore.self x-data="{ open: false }" x-init="() => { $watch('open', val => { if(!val) $wire.resetForm() }); $wire.on('show-review-form', () => { open = true }); $wire.on('hide-review-form', () => { open = false }); }" x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" @keydown.escape.window="open = false">
+        <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black/50" @click="open = false"></div>
+        <div x-show="open" x-transition class="relative bg-white rounded-xl shadow-xl border border-gray-200 w-full max-w-lg p-6 z-10">
+            <button type="button" @click="open = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
             <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ $editId ? 'Edit Review' : 'New Review' }}</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                    <input type="text" wire:model="name" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm">
-                    @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+            <form wire:submit="save">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                        <input type="text" wire:model="name" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm">
+                        @error('name') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                        <input type="text" wire:model="location" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <input type="text" wire:model="location" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                    <select wire:model="rating" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm">
+                        @for($i = 5; $i >= 1; $i--)
+                            <option value="{{ $i }}">{{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
+                        @endfor
+                    </select>
                 </div>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                <select wire:model="rating" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm">
-                    @for($i = 5; $i >= 1; $i--)
-                        <option value="{{ $i }}">{{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
-                    @endfor
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Content *</label>
-                <textarea wire:model="content" rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"></textarea>
-                @error('content') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-            </div>
-            <div class="flex items-center gap-3">
-                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">Save</button>
-                @if($editId)
-                    <button type="button" wire:click="resetForm" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
-                @endif
-            </div>
-        </form>
-    @endif
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+                    <textarea wire:model="content" rows="4" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"></textarea>
+                    @error('content') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="flex items-center justify-end gap-3">
+                    <button type="button" @click="open = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table class="w-full">
