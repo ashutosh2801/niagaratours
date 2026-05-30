@@ -36,10 +36,13 @@
                         <th class="px-6 py-3">Title</th>
                         <th class="px-6 py-3">Category</th>
                         <th class="px-6 py-3">Destination</th>
+                        <th class="px-6 py-3">Created By</th>
                         <th class="px-6 py-3">Price</th>
                         <th class="px-6 py-3">Status</th>
                         <th class="px-6 py-3">Featured</th>
+                        @if($canSeeAll)
                         <th class="px-6 py-3">Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -64,6 +67,7 @@
                             </td>
                             <td class="px-6 py-4 text-gray-700">{{ $tour->category->name ?? 'Uncategorized' }}</td>
                             <td class="px-6 py-4 text-gray-700">{{ $tour->destination->name ?? '-' }}</td>
+                            <td class="px-6 py-4 text-gray-700">{{ $tour->creator->name ?? 'Unknown' }}</td>
                             <td class="px-6 py-4">
                                 <span class="font-medium text-gray-900">${{ number_format($tour->price, 2) }}</span>
                                 @if($tour->sale_price)
@@ -83,6 +87,7 @@
                                     <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                                 @endif
                             </td>
+                            @if($canSeeAll)
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('admin.tours.edit', $tour) }}" wire:navigate class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Edit">
@@ -96,10 +101,11 @@
                                     </button>
                                 </div>
                             </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-12 text-center">
+                            <td colspan="{{ $canSeeAll ? 10 : 9 }}" class="px-6 py-12 text-center">
                                 <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <p class="text-gray-500 font-medium">No tours found</p>
                                 <p class="text-gray-400 text-sm mt-1">Get started by creating your first tour.</p>

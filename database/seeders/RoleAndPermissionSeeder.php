@@ -30,6 +30,7 @@ class RoleAndPermissionSeeder extends Seeder
             ['name' => 'Settings', 'slug' => 'settings', 'group' => 'System'],
             ['name' => 'Roles', 'slug' => 'roles', 'group' => 'System'],
             ['name' => 'Activity Log', 'slug' => 'activity-logs', 'group' => 'System'],
+            ['name' => 'Permissions', 'slug' => 'permissions', 'group' => 'System'],
         ];
 
         foreach ($permissions as $perm) {
@@ -54,6 +55,7 @@ class RoleAndPermissionSeeder extends Seeder
             'dashboard', 'tours', 'categories', 'destinations', 'orders', 'payments',
             'pages', 'notifications', 'reviews', 'posts', 'newsletter',
             'media', 'sections', 'menus', 'users', 'settings', 'activity-logs',
+            'permissions',
         ])->pluck('id'));
 
         // Editor - content only

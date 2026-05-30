@@ -35,6 +35,7 @@ class Tour extends Model
         'booking_url',
         'meta_title',
         'meta_description',
+        'created_by',
     ];
 
     protected function casts(): array
@@ -68,6 +69,11 @@ class Tour extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function getFormattedPriceAttribute(): string

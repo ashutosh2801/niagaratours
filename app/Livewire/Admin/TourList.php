@@ -73,6 +73,7 @@ class TourList extends Component
         $clone->title = $original->title . ' (Copy)';
         $clone->slug = $original->slug . '-copy-' . Str::random(4);
         $clone->is_active = false;
+        $clone->created_by = auth()->id();
         $clone->created_at = now();
         $clone->updated_at = now();
         $clone->save();
@@ -95,7 +96,13 @@ class TourList extends Component
 
     private function query()
     {
-        return Tour::with('category', 'destination')
+        $user = auth()->user();
+        $canSeeAll = $user->hasRole('administrator') || $user->hasRole('admin');
+
+        return Tour::with('category', 'destination', 'creator')
+            ->when(!$canSeeAll, function ($q) use ($user) {
+                $q->where('created_by', $user->id);
+            })
             ->where(function ($q) {
                 $q->where('title', 'like', '%'.$this->search.'%')
                   ->orWhere('location', 'like', '%'.$this->search.'%');
@@ -105,8 +112,12 @@ class TourList extends Component
 
     public function render()
     {
+        $user = auth()->user();
+        $canSeeAll = $user->hasRole('administrator') || $user->hasRole('admin');
+
         return view('admin.tours.index', [
-            'tours' => $this->query()->paginate(10)
+            'tours' => $this->query()->paginate(10),
+            'canSeeAll' => $canSeeAll,
         ]);
     }
 }

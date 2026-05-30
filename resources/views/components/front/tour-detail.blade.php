@@ -1,4 +1,56 @@
 <div>
+    @php
+        $schemaImages = collect(array_merge(
+            $tour->images ?? [],
+            $tour->featured_image ? [$tour->featured_image] : []
+        ))->filter()->map(fn($img) => str_starts_with($img, 'http') ? $img : url($img))->values()->toArray();
+
+        $schemaPrice = ($tour->starting_price ?: $tour->price) ?: 0;
+    @endphp
+    @push('head')
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+            {"@type": "ListItem", "position": 2, "name": "Tours", "item": "{{ route('tours') }}"},
+            {"@type": "ListItem", "position": 3, "name": "{{ $tour->title }}"}
+        ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "@id": "{{ route('tour.detail', $tour->slug) }}#product",
+        "name": "{{ $tour->title }}",
+        "description": "{{ strip_tags($tour->short_description ?: $tour->description ?? '') }}",
+        "url": "{{ route('tour.detail', $tour->slug) }}",
+        "image": {{ json_encode($schemaImages) }},
+        "brand": {
+            "@type": "Brand",
+            "name": "{{ App\Models\Setting::get('site_name', 'Niagara Tours') }}"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "{{ number_format($schemaPrice, 2, '.', '') }}",
+            "priceCurrency": "CAD",
+            "availability": "https://schema.org/InStock",
+            "url": "{{ route('tour.detail', $tour->slug) }}"
+        }
+        @if(($tour->review_count ?? 0) > 0)
+        ,"aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "{{ number_format($tour->rating ?? 5, 1) }}",
+            "reviewCount": "{{ $tour->review_count }}",
+            "bestRating": "5"
+        }
+        @endif
+    }
+    </script>
+    @endpush
+
     {{-- =========================
         TOP HERO SECTION
     ========================== --}}

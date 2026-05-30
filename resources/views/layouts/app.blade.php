@@ -36,6 +36,57 @@
     <meta name="twitter:description" content="@yield('og_description', $metaDescription)">
     <meta name="twitter:image" content="@yield('og_image', App\Models\Setting::get('og_image', asset('images/og-default.jpg')))">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": "{{ url('/') }}#organization",
+        "name": "{{ $siteName }}",
+        "url": "{{ url('/') }}",
+        "logo": "{{ $logo ? url($logo) : url('/images/logo.png') }}",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "{{ $phone }}",
+            "contactType": "customer service",
+            "email": "{{ $contactEmail }}"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ $contactAddress }}",
+            "addressCountry": "CA"
+        },
+        "sameAs": [
+            "{{ $socialFacebook }}",
+            "{{ $socialInstagram }}",
+            "{{ $socialTwitter }}",
+            "{{ $socialYoutube }}"
+        ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "{{ url('/') }}#website",
+        "url": "{{ url('/') }}",
+        "name": "{{ $siteName }}",
+        "description": "{{ $metaDescription }}",
+        "publisher": {
+            "@id": "{{ url('/') }}#organization"
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "{{ route('tours') }}?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
     @stack('head')
 
 </head>

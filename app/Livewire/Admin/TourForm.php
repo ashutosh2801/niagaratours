@@ -283,6 +283,7 @@ class TourForm extends Component
             session()->flash('message', 'Tour updated successfully.');
             ActivityLogger::log('updated', 'Tour', "Tour '{$this->title}' updated");
         } else {
+            $data['created_by'] = auth()->id();
             Tour::create($data);
             session()->flash('message', 'Tour created successfully.');
             ActivityLogger::log('created', 'Tour', "Tour '{$this->title}' created");

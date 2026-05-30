@@ -49,6 +49,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
+    public function tours(): HasMany
+    {
+        return $this->hasMany(Tour::class, 'created_by');
+    }
+
     public function hasRole(string $slug): bool
     {
         return $this->roles->contains('slug', $slug);

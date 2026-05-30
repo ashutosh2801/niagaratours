@@ -19,6 +19,8 @@ use App\Livewire\Admin\CategoryForm;
 use App\Livewire\Admin\DestinationList;
 use App\Livewire\Admin\DestinationForm;
 use App\Livewire\Admin\ActivityLogList;
+use App\Livewire\Admin\PermissionList;
+use App\Livewire\Admin\PermissionForm;
 
 Route::view('/', 'welcome')->name('home');
 Route::get('/tours', App\Livewire\Front\TourList::class)->name('tours');
@@ -78,6 +80,9 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/roles', App\Livewire\Admin\RoleList::class)->name('roles');
     Route::get('/roles/create', App\Livewire\Admin\RoleForm::class)->name('roles.create');
     Route::get('/roles/{roleId}/edit', App\Livewire\Admin\RoleForm::class)->name('roles.edit');
+    Route::get('/permissions', PermissionList::class)->name('permissions');
+    Route::get('/permissions/create', PermissionForm::class)->name('permissions.create');
+    Route::get('/permissions/{permissionId}/edit', PermissionForm::class)->name('permissions.edit');
     Route::get('/media', App\Livewire\Admin\MediaLibrary::class)->name('media');
     Route::get('/sections', App\Livewire\Admin\SectionList::class)->name('sections');
     Route::get('/menus', App\Livewire\Admin\MenuList::class)->name('menus');
