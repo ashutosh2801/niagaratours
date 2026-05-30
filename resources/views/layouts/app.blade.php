@@ -5,11 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
-        $siteName = App\Models\Setting::get('site_name', 'Niagara Tours');
-        $metaTitle = App\Models\Setting::get('meta_title', 'Niagara Tours - Book Your Niagara Falls Adventure');
-        $metaDescription = App\Models\Setting::get('meta_description', 'Experience the best Niagara Falls tours with Niagara Tours. Book your adventure today!');
-        $metaKeywords = App\Models\Setting::get('meta_keywords', '');
-        $favicon = App\Models\Setting::get('favicon', '');
+        $settings = App\Models\Setting::all()->pluck('value', 'key')->toArray();
+        $siteName = $settings['site_name'] ?? 'Niagara Tours';
+        $metaTitle = $settings['meta_title'] ?? 'Niagara Tours - Book Your Niagara Falls Adventure';
+        $metaDescription = $settings['meta_description'] ?? 'Experience the best Niagara Falls tours with Niagara Tours. Book your adventure today!';
+        $metaKeywords = $settings['meta_keywords'] ?? '';
+        $favicon = $settings['favicon'] ?? '';
+        $logo = $settings['logo'] ?? '';
+        $phone = $settings['contact_phone'] ?? '+1-877-888-2339';
+        $contactEmail = $settings['contact_email'] ?? 'info@tourbeez.com';
+        $contactAddress = $settings['contact_address'] ?? '123 Falls Avenue, Niagara Falls, ON, Canada';
+        $socialFacebook = $settings['social_facebook'] ?? '#';
+        $socialInstagram = $settings['social_instagram'] ?? '#';
+        $socialTwitter = $settings['social_twitter'] ?? '#';
+        $socialYoutube = $settings['social_youtube'] ?? '#';
     @endphp
     <title>@yield('title', $siteName) - {{ $siteName }}</title>
     <meta name="description" content="@yield('meta_description', $metaDescription)">
@@ -92,18 +101,8 @@
 </head>
 <body class="antialiased text-gray-800 bg-white">
     @php
-        $settings = App\Models\Setting::all()->pluck('value', 'key')->toArray();
-        $phone = $settings['contact_phone'] ?? '+1-877-888-2339';
         $tagline = $settings['site_tagline'] ?? 'Experience the Falls Like Never Before';
-        $logo = $settings['logo'] ?? '';
-        $siteName = $settings['site_name'] ?? 'Niagara Tours';
         $menus = App\Models\Menu::getActive();
-        $contactEmail = $settings['contact_email'] ?? 'info@tourbeez.com';
-        $contactAddress = $settings['contact_address'] ?? '123 Falls Avenue, Niagara Falls, ON, Canada';
-        $socialFacebook = $settings['social_facebook'] ?? '#';
-        $socialInstagram = $settings['social_instagram'] ?? '#';
-        $socialTwitter = $settings['social_twitter'] ?? '#';
-        $socialYoutube = $settings['social_youtube'] ?? '#';
     @endphp
 
     <div class="flex flex-col min-h-screen">
