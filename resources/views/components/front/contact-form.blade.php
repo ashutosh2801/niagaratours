@@ -16,7 +16,7 @@
                 type="text"
                 wire:model="name"
                 placeholder="Your Name"
-                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-600"
+                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-600"
             >
             @error('name')
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -33,7 +33,7 @@
                 type="email"
                 wire:model="email"
                 placeholder="Your Email"
-                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-600"
+                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-600"
             >
             @error('email')
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -50,7 +50,7 @@
                 type="text"
                 wire:model="subject"
                 placeholder="Your Subject"
-                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-600"
+                class="w-full h-12 rounded-xl border border-gray-200 bg-white text-base px-6 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-600"
             >
             @error('subject')
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -67,7 +67,7 @@
                 rows="3"
                 wire:model="message"
                 placeholder="Write your message"
-                class="w-full rounded-2xl border border-gray-200 bg-white px-6 py-5 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-600"
+                class="w-full rounded-2xl border border-gray-200 bg-white px-6 py-5 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-600"
             ></textarea>
             @error('message')
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
