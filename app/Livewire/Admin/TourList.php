@@ -7,6 +7,8 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Tour;
+use App\Models\Category;
+use App\Models\Destination;
 use App\Helpers\ActivityLogger;
 use Illuminate\Support\Str;
 
@@ -18,6 +20,10 @@ class TourList extends Component
 
     public $search = '';
     public $selectedIds = [];
+    public $filterCategory = '';
+    public $filterDestination = '';
+    public $filterStatus = '';
+    public $filterFeatured = '';
 
     public function delete($id)
     {
@@ -107,8 +113,25 @@ class TourList extends Component
                 $q->where('title', 'like', '%'.$this->search.'%')
                   ->orWhere('location', 'like', '%'.$this->search.'%');
             })
+            ->when($this->filterCategory, fn($q) => $q->where('category_id', $this->filterCategory))
+            ->when($this->filterDestination, fn($q) => $q->where('destination_id', $this->filterDestination))
+            ->when($this->filterStatus === 'active', fn($q) => $q->where('is_active', true))
+            ->when($this->filterStatus === 'inactive', fn($q) => $q->where('is_active', false))
+            ->when($this->filterFeatured === 'featured', fn($q) => $q->where('is_featured', true))
+            ->when($this->filterFeatured === 'not-featured', fn($q) => $q->where('is_featured', false))
             ->orderBy('created_at', 'desc');
     }
+
+    public function resetFilters()
+    {
+        $this->reset(['filterCategory', 'filterDestination', 'filterStatus', 'filterFeatured', 'search']);
+    }
+
+    public function updatedSearch() { $this->resetPage(); }
+    public function updatedFilterCategory() { $this->resetPage(); }
+    public function updatedFilterDestination() { $this->resetPage(); }
+    public function updatedFilterStatus() { $this->resetPage(); }
+    public function updatedFilterFeatured() { $this->resetPage(); }
 
     public function render()
     {
@@ -118,6 +141,8 @@ class TourList extends Component
         return view('admin.tours.index', [
             'tours' => $this->query()->paginate(10),
             'canSeeAll' => $canSeeAll,
+            'categories' => Category::select('id', 'name')->orderBy('name')->get(),
+            'destinations' => Destination::select('id', 'name')->orderBy('name')->get(),
         ]);
     }
 }

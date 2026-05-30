@@ -15,6 +15,40 @@
         <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">{{ session('message') }}</div>
     @endif
 
+    <div class="mb-4 flex flex-wrap items-center gap-3">
+        <select wire:model.live="filterCategory" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+            <option value="">All Categories</option>
+            @foreach($categories ?? [] as $cat)
+                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+            @endforeach
+        </select>
+
+        <select wire:model.live="filterDestination" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+            <option value="">All Destinations</option>
+            @foreach($destinations ?? [] as $dest)
+                <option value="{{ $dest->id }}">{{ $dest->name }}</option>
+            @endforeach
+        </select>
+
+        <select wire:model.live="filterStatus" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+
+        <select wire:model.live="filterFeatured" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+            <option value="">All</option>
+            <option value="featured">Featured</option>
+            <option value="not-featured">Not Featured</option>
+        </select>
+
+        @if($filterCategory || $filterDestination || $filterStatus || $filterFeatured || $search)
+            <button wire:click="resetFilters" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                Clear Filters
+            </button>
+        @endif
+    </div>
+
     @if(!empty($selectedIds))
         <div class="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
             <span class="text-sm text-blue-700">{{ count($selectedIds) }} tour(s) selected</span>

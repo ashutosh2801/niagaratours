@@ -21,6 +21,7 @@ class MediaLibrary extends Component
     use WithPagination, WithFileUploads;
 
     public $uploads = [];
+    public $selectedIds = [];
 
     protected function rules()
     {
@@ -77,6 +78,36 @@ class MediaLibrary extends Component
         $media->delete();
         session()->flash('message', 'File deleted successfully.');
         ActivityLogger::log('deleted', 'Media', "File '{$name}' deleted from media library");
+    }
+
+    public function toggleSelectAll()
+    {
+        $ids = Media::orderBy('created_at', 'desc')->pluck('id')->toArray();
+
+        if (empty(array_diff($ids, $this->selectedIds))) {
+            $this->selectedIds = [];
+        } else {
+            $this->selectedIds = $ids;
+        }
+    }
+
+    public function deleteSelected()
+    {
+        if (!auth()->user()->hasPermission('media')) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $mediaItems = Media::whereIn('id', $this->selectedIds)->get();
+        $count = $mediaItems->count();
+
+        foreach ($mediaItems as $media) {
+            Storage::disk($media->disk ?? Setting::get('storage_disk', 'public'))->delete($media->path);
+            $media->delete();
+        }
+
+        ActivityLogger::log('deleted', 'Media', "{$count} file(s) deleted from media library");
+        $this->selectedIds = [];
+        session()->flash('message', "{$count} file(s) deleted successfully.");
     }
 
     public function render()
