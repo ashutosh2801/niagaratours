@@ -10,7 +10,7 @@
     @push('head')
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
@@ -21,7 +21,7 @@
     </script>
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "Product",
         "@id": "{{ route('tour.detail', $tour->slug) }}#product",
         "name": "{{ $tour->title }}",

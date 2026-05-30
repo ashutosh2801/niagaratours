@@ -39,7 +39,7 @@
 
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "Organization",
         "@id": "{{ url('/') }}#organization",
         "name": "{{ $siteName }}",
@@ -67,7 +67,7 @@
 
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "WebSite",
         "@id": "{{ url('/') }}#website",
         "url": "{{ url('/') }}",
