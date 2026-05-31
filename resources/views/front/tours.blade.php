@@ -77,18 +77,24 @@
 
                     <div>
                         <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Price Range</h3>
-                        <div class="flex items-center justify-between text-sm text-gray-700 mb-2" x-data="{ min: $wire.entangle('min_price'), max: $wire.entangle('max_price') }">
+                        <div class="flex items-center justify-between text-sm text-gray-700 mb-2" x-data="{ min: $wire.entangle('min_price').live, max: $wire.entangle('max_price').live }">
                             <span x-text="'$' + Number(min).toLocaleString()">${{ number_format($min_price) }}</span>
-                            <span x-text="'$' + Number(max).toLocaleString()">${{ number_format($max_price) }}</span>
+                            <span x-text="'$' + Number(max).toLocaleString()">${{ number_format($max_price ?? $maxAvailablePrice) }}</span>
                         </div>
                         <div class="relative h-6" x-data="{
-                            min: $wire.entangle('min_price'),
-                            max: $wire.entangle('max_price'),
+                            min: $wire.entangle('min_price').live,
+                            max: $wire.entangle('max_price').live,
                             minRange: 0,
-                            maxRange: 1000,
+                            maxRange: @js(max(10, (int) $maxAvailablePrice)),
                             init() {
+                                if (this.max === null || this.max > this.maxRange) {
+                                    this.max = this.maxRange;
+                                }
                                 this.$watch('min', v => { if (v > this.max) this.min = this.max; });
-                                this.$watch('max', v => { if (v < this.min) this.max = this.min; });
+                                this.$watch('max', v => {
+                                    if (v < this.min) this.max = this.min;
+                                    if (v > this.maxRange) this.max = this.maxRange;
+                                });
                             }
                         }">
                             <div class="absolute top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 rounded-full"></div>

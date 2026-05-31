@@ -20,7 +20,8 @@ class TourList extends Component
     public $selectedCategories = [];
     public $selectedDestinations = [];
     public $min_price = 0;
-    public $max_price = 1000;
+    public $max_price = null;
+    public $maxAvailablePrice = 0;
     public $selectedDurations = [];
     public $sortBy = 'latest';
 
@@ -29,10 +30,19 @@ class TourList extends Component
         'selectedCategories' => ['except' => []],
         'selectedDestinations' => ['except' => []],
         'min_price' => ['except' => 0],
-        'max_price' => ['except' => 1000],
+        'max_price' => ['except' => null],
         'selectedDurations' => ['except' => []],
         'sortBy' => ['except' => 'latest'],
     ];
+
+    public function mount()
+    {
+        $this->maxAvailablePrice = $this->resolveMaxAvailablePrice();
+
+        if (is_null($this->max_price)) {
+            $this->max_price = $this->maxAvailablePrice;
+        }
+    }
 
     public function updatingSearch()
     {
@@ -46,6 +56,8 @@ class TourList extends Component
 
     public function updatingMinPrice()
     {
+        $this->min_price = max(0, (int) $this->min_price);
+
         if ($this->min_price > $this->max_price) {
             $this->min_price = $this->max_price;
         }
@@ -54,6 +66,8 @@ class TourList extends Component
 
     public function updatingMaxPrice()
     {
+        $this->max_price = min((int) $this->max_price, $this->maxAvailablePrice);
+
         if ($this->max_price < $this->min_price) {
             $this->max_price = $this->min_price;
         }
@@ -74,12 +88,34 @@ class TourList extends Component
     {
         $this->reset(['search', 'selectedCategories', 'selectedDestinations', 'min_price', 'max_price', 'selectedDurations', 'sortBy']);
         $this->min_price = 0;
-        $this->max_price = 1000;
+        $this->maxAvailablePrice = $this->resolveMaxAvailablePrice();
+        $this->max_price = $this->maxAvailablePrice;
         $this->resetPage();
+    }
+
+    private function resolveMaxAvailablePrice(): int
+    {
+        $maxPrice = (float) Tour::where('is_active', true)->max('price');
+
+        if ($maxPrice <= 0) {
+            return 0;
+        }
+
+        return (int) (ceil($maxPrice / 10) * 10);
     }
 
     public function render()
     {
+        $this->maxAvailablePrice = $this->resolveMaxAvailablePrice();
+
+        if (is_null($this->max_price) || $this->max_price > $this->maxAvailablePrice) {
+            $this->max_price = $this->maxAvailablePrice;
+        }
+
+        if ($this->min_price > $this->max_price) {
+            $this->min_price = $this->max_price;
+        }
+
         $query = Tour::where('is_active', true)->with('category');
 
         if ($this->search) {
@@ -101,7 +137,7 @@ class TourList extends Component
         if ($this->min_price > 0) {
             $query->where('price', '>=', $this->min_price);
         }
-        if ($this->max_price < 1000) {
+        if (!is_null($this->max_price) && $this->max_price < $this->maxAvailablePrice) {
             $query->where('price', '<=', $this->max_price);
         }
 
